@@ -36,7 +36,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 #endif
 
-class RTSPClient: public Medium {
+class LIVEMEDIA_API RTSPClient: public Medium {
 public:
   static RTSPClient* createNew(UsageEnvironment& env, char const* rtspURL,
 			       int verbosityLevel = 0,
@@ -250,7 +250,7 @@ private: // redefined virtual functions
   virtual Boolean isRTSPClient() const;
 
 private:
-  class RequestQueue {
+  class LIVEMEDIA_API RequestQueue {
   public:
     RequestQueue();
     RequestQueue(RequestQueue& origQueue); // moves the queue contents to the new queue

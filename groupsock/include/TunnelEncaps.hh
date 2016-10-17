@@ -27,7 +27,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 typedef u_int16_t Cookie;
 
-class TunnelEncapsulationTrailer {
+class LIVEMEDIA_API TunnelEncapsulationTrailer {
 	// The trailer is layed out as follows:
 	// bytes 0-1:	source 'cookie'
 	// bytes 2-3:	destination 'cookie'

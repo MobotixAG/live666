@@ -27,7 +27,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #define TCP_STREAM_SINK_BUFFER_SIZE 10000
 
-class TCPStreamSink: public MediaSink {
+class LIVEMEDIA_API TCPStreamSink: public MediaSink {
 public:
   static TCPStreamSink* createNew(UsageEnvironment& env, int socketNum);
   // "socketNum" is the socket number of an existing, writable TCP socket (which should be non-blocking).

@@ -52,7 +52,7 @@ public:
   unsigned char fStreamChannelId;
 };
 
-class RTPInterface {
+class LIVEMEDIA_API RTPInterface {
 public:
   RTPInterface(Medium* owner, Groupsock* gs);
   virtual ~RTPInterface();

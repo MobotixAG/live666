@@ -39,6 +39,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 #include <stdio.h>
 
+#include "export.h"
+
 // The following makes the Borland compiler happy:
 #ifdef __BORLANDC__
 #define _strnicmp strnicmp
@@ -47,7 +49,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #define mediumNameMaxLen 30
 
-class Medium {
+class LIVEMEDIA_API Medium {
 public:
   static Boolean lookupByName(UsageEnvironment& env,
 			      char const* mediumName,
@@ -88,7 +90,7 @@ private:
 // A data structure for looking up a Medium by its string name.
 // (It is used only to implement "Medium", but we make it visible here, in case developers want to use it to iterate over
 //  the whole set of "Medium" objects that we've created.)
-class MediaLookupTable {
+class LIVEMEDIA_API MediaLookupTable {
 public:
   static MediaLookupTable* ourMedia(UsageEnvironment& env);
   HashTable const& getTable() { return *fTable; }

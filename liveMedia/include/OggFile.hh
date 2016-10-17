@@ -31,7 +31,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 class OggTrack; // forward
 class OggDemux; // forward
 
-class OggFile: public Medium {
+class LIVEMEDIA_API OggFile: public Medium {
 public:
   typedef void (onCreationFunc)(OggFile* newFile, void* clientData);
   static void createNew(UsageEnvironment& env, char const* fileName,
@@ -87,7 +87,7 @@ private:
   class OggFileParser* fParserForInitialization;
 };
 
-class OggTrack {
+class LIVEMEDIA_API OggTrack {
 public:
   OggTrack();
   virtual ~OggTrack();
@@ -126,7 +126,7 @@ public:
     }
 };
 
-class OggTrackTableIterator {
+class LIVEMEDIA_API OggTrackTableIterator {
 public:
   OggTrackTableIterator(class OggTrackTable& ourTable);
   virtual ~OggTrackTableIterator();
@@ -137,7 +137,7 @@ private:
   HashTable::Iterator* fIter;
 };
 
-class OggDemux: public Medium {
+class LIVEMEDIA_API OggDemux: public Medium {
 public:
   FramedSource* newDemuxedTrack(u_int32_t& resultTrackNumber);
     // Returns a new stream ("FramedSource" subclass) that represents the next media track

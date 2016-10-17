@@ -30,7 +30,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 class RTPReceptionStatsDB; // forward
 
-class RTPSource: public FramedSource {
+class LIVEMEDIA_API RTPSource: public FramedSource {
 public:
   static Boolean lookupByName(UsageEnvironment& env, char const* sourceName,
 			      RTPSource*& resultSource);

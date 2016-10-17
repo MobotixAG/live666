@@ -25,11 +25,13 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include <Boolean.hh>
 #endif
 
+#include "export.h"
+
 // A class used for digest authentication.
 // The "realm", and "nonce" fields are supplied by the server
 // (in a "401 Unauthorized" response).
 // The "username" and "password" fields are supplied by the client.
-class Authenticator {
+class LIVEMEDIA_API Authenticator {
 public:
   Authenticator();
   Authenticator(char const* username, char const* password, Boolean passwordIsMD5 = False);

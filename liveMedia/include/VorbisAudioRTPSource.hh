@@ -25,7 +25,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "MultiFramedRTPSource.hh"
 #endif
 
-class VorbisAudioRTPSource: public MultiFramedRTPSource {
+class LIVEMEDIA_API VorbisAudioRTPSource: public MultiFramedRTPSource {
 public:
   static VorbisAudioRTPSource*
   createNew(UsageEnvironment& env, Groupsock* RTPgs,

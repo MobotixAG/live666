@@ -36,7 +36,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // An "OutputSocket" is (by default) used only to send packets.
 // No packets are received on it (unless a subclass arranges this)
 
-class OutputSocket: public Socket {
+class LIVEMEDIA_API OutputSocket: public Socket {
 public:
   OutputSocket(UsageEnvironment& env);
   virtual ~OutputSocket();
@@ -79,7 +79,7 @@ public:
 // As the name suggests, it was originally designed to send/receive
 // multicast, but it can send/receive unicast as well.
 
-class Groupsock: public OutputSocket {
+class LIVEMEDIA_API Groupsock: public OutputSocket {
 public:
   Groupsock(UsageEnvironment& env, struct in_addr const& groupAddr,
 	    Port port, u_int8_t ttl);
@@ -174,7 +174,7 @@ UsageEnvironment& operator<<(UsageEnvironment& s, const Groupsock& g);
 
 // A data structure for looking up a 'groupsock'
 // by (multicast address, port), or by socket number
-class GroupsockLookupTable {
+class LIVEMEDIA_API GroupsockLookupTable {
 public:
   Groupsock* Fetch(UsageEnvironment& env, netAddressBits groupAddress,
 		   Port port, u_int8_t ttl, Boolean& isNew);

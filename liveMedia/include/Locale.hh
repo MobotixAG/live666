@@ -48,10 +48,11 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 #endif
 
+#include "export.h"
 
 enum LocaleCategory { All, Numeric }; // define and implement more categories later, as needed
 
-class Locale {
+class LIVEMEDIA_API Locale {
 public:
   Locale(char const* newLocale, LocaleCategory category = All);
   virtual ~Locale();
