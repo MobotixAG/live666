@@ -26,7 +26,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "FramedFilter.hh"
 #endif
 
-class MPEG2TransportStreamAccumulator: public FramedFilter {
+class LIVEMEDIA_API MPEG2TransportStreamAccumulator: public FramedFilter {
 public:
   static MPEG2TransportStreamAccumulator* createNew(UsageEnvironment& env,
 						    FramedSource* inputSource,
@@ -69,7 +69,7 @@ private:
 #include "MP3ADUTranscoder.hh"
 #endif
 
-class MP3Transcoder: public MP3FromADUSource {
+class LIVEMEDIA_API MP3Transcoder: public MP3FromADUSource {
 public:
   static MP3Transcoder* createNew(UsageEnvironment& env,
 				  unsigned outBitrate /* in kbps */,
