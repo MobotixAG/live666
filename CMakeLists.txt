@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 2.6 )
+cmake_minimum_required ( VERSION 3.0 )
 
 set ( PROJECT_NAME live666 )
 
@@ -24,9 +24,19 @@ include_directories ( ${${PROJECT_NAME}_HOME}/groupsock/include )
 include_directories ( ${${PROJECT_NAME}_HOME}/liveMedia/include )
 
 if ( WIN32 )
-   set ( ${PROJECT_NAME}_DEFINITIONS -DWINNT )
+   list ( APPEND ${PROJECT_NAME}_DEFINITIONS
+      -DWINNT
+   )
 else ()
-   set ( ${PROJECT_NAME}_DEFINITIONS "" )
+   list ( APPEND ${PROJECT_NAME}_DEFINITIONS
+      -DSOCKLEN_T=socklen_t
+   )
+   if ( APPLE )
+      list ( APPEND ${PROJECT_NAME}_DEFINITIONS
+         -DHAVE_SOCKADDR_LEN=1
+         -DTIME_BASE=int
+      )
+   endif ()
 endif ()
 
 if ( BUILD_SHARED_LIBS )
@@ -473,8 +483,8 @@ add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADE
 
 set ( ${PROJECT_NAME}_LINK_LIBRARIES "" )
 if ( WIN32 )
-	list ( APPEND ${PROJECT_NAME}_LINK_LIBRARIES
-	   ws2_32
+   list ( APPEND ${PROJECT_NAME}_LINK_LIBRARIES
+      ws2_32
    )
 endif ()
 target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_LINK_LIBRARIES} )
@@ -487,20 +497,27 @@ endif ()
 
 # Disable warnings
 if ( WIN32 AND NOT CMAKE_COMPILER_IS_GNUCXX )
-   list ( APPEND MX_DISABLE_WARNINGS
+   list ( APPEND ${PROJECT_NAME}_DISABLE_WARNINGS
       "/wd4018" # 'expression' : signed/unsigned mismatch
       "/wd4244" # 'conversion' conversion from 'type1' to 'type2', possible loss of data
       "/wd4267" # 'var' : conversion from 'size_t' to 'type', possible loss of data
       "/wd4312" # 'operation' : conversion from 'type1' to 'type2' of greater size
       "/wd4334" # 'operator' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
-      "/wd4477" # ‘<function>’ : format string ‘<format-string>’ requires an argument of type ‘<type>’, but variadic argument <position> has type ‘<type>’ 
+      "/wd4477" # <function> : format string <format-string> requires an argument of type <type>, but variadic argument <position> has type <type> 
       "/wd4996" # 'function': was declared deprecated also 'std::<function name>': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.To disable this warning, use -D_SCL_SECURE_NO_WARNINGS.See documentation on how to use Visual C++ 'Checked Iterators'
    )
 else ()
-   # Disable all warnings
-   #set( CMAKE_COMMON_COMPILER_FLAGS "${CMAKE_COMMON_COMPILER_FLAGS} -w" )
+   list ( APPEND ${PROJECT_NAME}_DISABLE_WARNINGS
+      "-Wno-unused-private-field"            # private field 'identifier' is not used
+      "-Wno-self-assign"                     # explicitly assigning a variable of type %0 to itself
+      "-Wno-self-assign-field"               # assigning field to itself
+      "-Wno-format"                          # format specifies type %0 but the argument has type %1
+      "-Wno-int-to-pointer-cast"             # cast to %1 from smaller integer type %0
+      "-Wno-array-bounds"                    # array index %0 is before the beginning of the array
+      "-Wno-tautological-undefined-compare"  # Reference cannot be bound to dereferenced null pointer in well-defined C++ code; comparison may be assumed to always evaluate to true
+   )
 endif ()
-foreach ( warning IN LISTS MX_DISABLE_WARNINGS )
+foreach ( warning IN LISTS ${PROJECT_NAME}_DISABLE_WARNINGS )
    set ( CMAKE_COMMON_COMPILER_FLAGS "${CMAKE_COMMON_COMPILER_FLAGS} ${warning}" )
 endforeach ()
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_COMMON_COMPILER_FLAGS}" )
