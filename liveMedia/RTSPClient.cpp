@@ -407,6 +407,9 @@ RTSPClient::~RTSPClient() {
 void RTSPClient::reset() {
   resetTCPSockets();
   resetResponseBuffer();
+  fRequestsAwaitingConnection.reset();
+  fRequestsAwaitingHTTPTunneling.reset();
+  fRequestsAwaitingResponse.reset();
   fServerAddress = 0;
 
   setBaseURL(NULL);
@@ -1729,18 +1732,22 @@ void RTSPClient::handleResponseBytes(int newBytesRead) {
 	  // Note: we accept "Allow:" instead of "Public:", so that "OPTIONS" requests made to HTTP servers will work.
 	} else if (checkForHeader(lineStart, "Location:", 9, headerParamsStr)) {
 	  setBaseURL(headerParamsStr);
-	} else if (checkForHeader(lineStart, "com.ses.streamID:", 16, headerParamsStr)) {
+	} else if (checkForHeader(lineStart, "com.ses.streamID:", 17, headerParamsStr)) {
 	  // Replace the tail of the 'base URL' with the value of this header parameter:
 	  char* oldBaseURLTail = strrchr(fBaseURL, '/');
 	  if (oldBaseURLTail != NULL) {
 	    unsigned newBaseURLLen
-	      = (oldBaseURLTail - fBaseURL) + 8/* for "/stream=" */ + strlen(headerParamsStr+1);
+	      = (oldBaseURLTail - fBaseURL) + 8/* for "/stream=" */ + strlen(headerParamsStr);
 	    char* newBaseURL = new char[newBaseURLLen + 1];
 	        // Note: We couldn't use "asprintf()", because some compilers don't support it
 	    sprintf(newBaseURL, "%.*s/stream=%s",
-		     (int)(oldBaseURLTail - fBaseURL), fBaseURL, headerParamsStr+1);
+		     (int)(oldBaseURLTail - fBaseURL), fBaseURL, headerParamsStr);
 	    setBaseURL(newBaseURL);
 	    delete[] newBaseURL;
+	  }
+	} else if (checkForHeader(lineStart, "Connection:", 11, headerParamsStr)) {
+	  if (_strncasecmp(headerParamsStr, "Close", 5) == 0) {
+	    resetTCPSockets();
 	  }
 	}
       }
@@ -1919,7 +1926,7 @@ RTSPClient::RequestQueue::RequestQueue(RequestQueue& origQueue)
 }
 
 RTSPClient::RequestQueue::~RequestQueue() {
-  delete fHead;
+  reset();
 }
 
 void RTSPClient::RequestQueue::enqueue(RequestRecord* request) {
@@ -1959,6 +1966,11 @@ RTSPClient::RequestRecord* RTSPClient::RequestQueue::findByCSeq(unsigned cseq) {
   return NULL;
 }
 
+void RTSPClient::RequestQueue::reset() {
+  delete fHead;
+  fHead = fTail = NULL;
+}
+
 
 #ifndef OMIT_REGISTER_HANDLING
 ////////// HandlerServerForREGISTERCommand implementation /////////
@@ -1993,16 +2005,23 @@ char const* HandlerServerForREGISTERCommand::allowedCommandNames() {
   return "OPTIONS, REGISTER";
 }
 
-Boolean HandlerServerForREGISTERCommand::weImplementREGISTER(char const* proxyURLSuffix, char*& responseStr) {
+Boolean HandlerServerForREGISTERCommand
+::weImplementREGISTER(char const* cmd/*"REGISTER" or "DEREGISTER"*/,
+		      char const* /*proxyURLSuffix*/, char*& responseStr) {
   responseStr = NULL;
-  return True;
+  // By default, we implement only "REGISTER"; not "DEREGISTER".  Subclass to implement "DEREGISTER"
+  return strcmp(cmd, "REGISTER") == 0;
 }
 
-void HandlerServerForREGISTERCommand::implementCmd_REGISTER(char const* url, char const* urlSuffix, int socketToRemoteServer,
-							    Boolean deliverViaTCP, char const* /*proxyURLSuffix*/) {
-  // Create a new "RTSPClient" object, and call our 'creation function' with it:
-  RTSPClient* newRTSPClient = createNewRTSPClient(url, fVerbosityLevel, fApplicationName, socketToRemoteServer);
+void HandlerServerForREGISTERCommand
+::implementCmd_REGISTER(char const* cmd/*"REGISTER" or "DEREGISTER"*/,
+			char const* url, char const* urlSuffix, int socketToRemoteServer,
+			Boolean deliverViaTCP, char const* /*proxyURLSuffix*/) {
+  if (strcmp(cmd, "REGISTER") == 0) { // By default, we don't implement "DEREGISTER"
+    // Create a new "RTSPClient" object, and call our 'creation function' with it:
+    RTSPClient* newRTSPClient = createNewRTSPClient(url, fVerbosityLevel, fApplicationName, socketToRemoteServer);
 
-  if (fCreationFunc != NULL) (*fCreationFunc)(newRTSPClient, deliverViaTCP);
+    if (fCreationFunc != NULL) (*fCreationFunc)(newRTSPClient, deliverViaTCP);
+  }
 }
 #endif

@@ -129,7 +129,6 @@ ProxyServerMediaSession::~ProxyServerMediaSession() {
   }
 
   // Then delete our state:
-  Medium::close(fTranscodingTable);
   Medium::close(fClientMediaSession);
   Medium::close(fProxyRTSPClient);
   Medium::close(fPresentationTimeSessionNormalizer);

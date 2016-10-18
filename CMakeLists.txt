@@ -4,9 +4,9 @@ set ( PROJECT_NAME live666 )
 
 project ( ${PROJECT_NAME} )
 
-set ( ${PROJECT_NAME}_VERSION_MAJOR "2016" )
-set ( ${PROJECT_NAME}_VERSION_MINOR "05" )
-set ( ${PROJECT_NAME}_VERSION_PATCH "20" )
+set ( ${PROJECT_NAME}_VERSION_MAJOR "1" )
+set ( ${PROJECT_NAME}_VERSION_MINOR "1" )
+set ( ${PROJECT_NAME}_VERSION_PATCH "0" )
 set ( ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
 if ( CMAKE_COMPILER_IS_GNUCXX )
@@ -180,6 +180,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG1or2VideoStreamFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2IndexFromTransportStream.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportFileServerMediaSubsession.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamAccumulator.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFromESSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFromPESSource.hh
@@ -397,6 +398,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG1or2VideoStreamFramer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2IndexFromTransportStream.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportFileServerMediaSubsession.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamAccumulator.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFramer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFromESSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFromPESSource.cpp
@@ -445,6 +447,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPCommon.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPRegisterSender.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServer.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServerRegister.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServerSupportingHTTPStreaming.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/ServerMediaSession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/SimpleRTPSink.cpp
