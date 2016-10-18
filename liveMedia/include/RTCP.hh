@@ -28,7 +28,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "RTPSource.hh"
 #endif
 
-class SDESItem {
+class LIVEMEDIA_API SDESItem {
 public:
   SDESItem(unsigned char tag, unsigned char const* value);
 
@@ -45,7 +45,7 @@ typedef void RTCPAppHandlerFunc(void* clientData,
 
 class RTCPMemberDatabase; // forward
 
-class RTCPInstance: public Medium {
+class LIVEMEDIA_API RTCPInstance: public Medium {
 public:
   static RTCPInstance* createNew(UsageEnvironment& env, Groupsock* RTCPgs,
 				 unsigned totSessionBW, /* in kbps */

@@ -25,57 +25,59 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "NetAddress.hh"
 #endif
 
-int setupDatagramSocket(UsageEnvironment& env, Port port);
-int setupStreamSocket(UsageEnvironment& env,
+#include "export.h"
+
+LIVEMEDIA_API int setupDatagramSocket(UsageEnvironment& env, Port port);
+LIVEMEDIA_API int setupStreamSocket(UsageEnvironment& env,
 		      Port port, Boolean makeNonBlocking = True);
 
-int readSocket(UsageEnvironment& env,
+LIVEMEDIA_API int readSocket(UsageEnvironment& env,
 	       int socket, unsigned char* buffer, unsigned bufferSize,
 	       struct sockaddr_in& fromAddress);
 
-Boolean writeSocket(UsageEnvironment& env,
+LIVEMEDIA_API Boolean writeSocket(UsageEnvironment& env,
 		    int socket, struct in_addr address, portNumBits portNum/*network byte order*/,
 		    u_int8_t ttlArg,
 		    unsigned char* buffer, unsigned bufferSize);
 
-Boolean writeSocket(UsageEnvironment& env,
+LIVEMEDIA_API Boolean writeSocket(UsageEnvironment& env,
 		    int socket, struct in_addr address, portNumBits portNum/*network byte order*/,
 		    unsigned char* buffer, unsigned bufferSize);
     // An optimized version of "writeSocket" that omits the "setsockopt()" call to set the TTL.
 
-void ignoreSigPipeOnSocket(int socketNum);
+LIVEMEDIA_API void ignoreSigPipeOnSocket(int socketNum);
 
-unsigned getSendBufferSize(UsageEnvironment& env, int socket);
-unsigned getReceiveBufferSize(UsageEnvironment& env, int socket);
-unsigned setSendBufferTo(UsageEnvironment& env,
+LIVEMEDIA_API unsigned getSendBufferSize(UsageEnvironment& env, int socket);
+LIVEMEDIA_API unsigned getReceiveBufferSize(UsageEnvironment& env, int socket);
+LIVEMEDIA_API unsigned setSendBufferTo(UsageEnvironment& env,
 			 int socket, unsigned requestedSize);
-unsigned setReceiveBufferTo(UsageEnvironment& env,
+LIVEMEDIA_API unsigned setReceiveBufferTo(UsageEnvironment& env,
 			    int socket, unsigned requestedSize);
-unsigned increaseSendBufferTo(UsageEnvironment& env,
+LIVEMEDIA_API unsigned increaseSendBufferTo(UsageEnvironment& env,
 			      int socket, unsigned requestedSize);
-unsigned increaseReceiveBufferTo(UsageEnvironment& env,
+LIVEMEDIA_API unsigned increaseReceiveBufferTo(UsageEnvironment& env,
 				 int socket, unsigned requestedSize);
 
-Boolean makeSocketNonBlocking(int sock);
-Boolean makeSocketBlocking(int sock, unsigned writeTimeoutInMilliseconds = 0);
+LIVEMEDIA_API Boolean makeSocketNonBlocking(int sock);
+LIVEMEDIA_API Boolean makeSocketBlocking(int sock, unsigned writeTimeoutInMilliseconds = 0);
   // A "writeTimeoutInMilliseconds" value of 0 means: Don't timeout
 
-Boolean socketJoinGroup(UsageEnvironment& env, int socket,
+LIVEMEDIA_API Boolean socketJoinGroup(UsageEnvironment& env, int socket,
 			netAddressBits groupAddress);
-Boolean socketLeaveGroup(UsageEnvironment&, int socket,
+LIVEMEDIA_API Boolean socketLeaveGroup(UsageEnvironment&, int socket,
 			 netAddressBits groupAddress);
 
 // source-specific multicast join/leave
-Boolean socketJoinGroupSSM(UsageEnvironment& env, int socket,
+LIVEMEDIA_API Boolean socketJoinGroupSSM(UsageEnvironment& env, int socket,
 			   netAddressBits groupAddress,
 			   netAddressBits sourceFilterAddr);
-Boolean socketLeaveGroupSSM(UsageEnvironment&, int socket,
+LIVEMEDIA_API Boolean socketLeaveGroupSSM(UsageEnvironment&, int socket,
 			    netAddressBits groupAddress,
 			    netAddressBits sourceFilterAddr);
 
-Boolean getSourcePort(UsageEnvironment& env, int socket, Port& port);
+LIVEMEDIA_API Boolean getSourcePort(UsageEnvironment& env, int socket, Port& port);
 
-netAddressBits ourIPAddress(UsageEnvironment& env); // in network order
+LIVEMEDIA_API netAddressBits ourIPAddress(UsageEnvironment& env); // in network order
 
 // IP addresses of our sending and receiving interfaces.  (By default, these
 // are INADDR_ANY (i.e., 0), specifying the default interface.)
@@ -83,10 +85,10 @@ extern netAddressBits SendingInterfaceAddr;
 extern netAddressBits ReceivingInterfaceAddr;
 
 // Allocates a randomly-chosen IPv4 SSM (multicast) address:
-netAddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);
+LIVEMEDIA_API netAddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);
 
 // Returns a simple "hh:mm:ss" string, for use in debugging output (e.g.)
-char const* timestampString();
+LIVEMEDIA_API char const* timestampString();
 
 
 #ifdef HAVE_SOCKADDR_LEN

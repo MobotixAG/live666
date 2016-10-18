@@ -25,7 +25,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "Boolean.hh"
 #endif
 
-class BitVector {
+#include "export.h"
+
+class LIVEMEDIA_API BitVector {
 public:
   BitVector(unsigned char* baseBytePtr,
 	    unsigned baseBitOffset,

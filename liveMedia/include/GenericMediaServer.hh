@@ -36,7 +36,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #define RESPONSE_BUFFER_SIZE 20000
 #endif
 
-class GenericMediaServer: public Medium {
+class LIVEMEDIA_API GenericMediaServer: public Medium {
 public:
   void addServerMediaSession(ServerMediaSession* serverMediaSession);
 
@@ -165,7 +165,7 @@ private:
 
 // A data structure used for optional user/password authentication:
 
-class UserAuthenticationDatabase {
+class LIVEMEDIA_API UserAuthenticationDatabase {
 public:
   UserAuthenticationDatabase(char const* realm = NULL,
 			     Boolean passwordsAreMD5 = False);

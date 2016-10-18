@@ -24,6 +24,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "NetCommon.h"
 #endif
 
+#include "export.h"
+
 #ifdef TIME_BASE
 typedef TIME_BASE time_base_seconds;
 #else
@@ -32,7 +34,7 @@ typedef long time_base_seconds;
 
 ///// A "Timeval" can be either an absolute time, or a time interval /////
 
-class Timeval {
+class LIVEMEDIA_API Timeval {
 public:
   time_base_seconds seconds() const {
     return fTv.tv_sec;
@@ -101,7 +103,7 @@ class DelayInterval operator-(Timeval const& arg1, Timeval const& arg2);
 
 ///// DelayInterval /////
 
-class DelayInterval: public Timeval {
+class LIVEMEDIA_API DelayInterval: public Timeval {
 public:
   DelayInterval(time_base_seconds seconds, time_base_seconds useconds)
     : Timeval(seconds, useconds) {}
@@ -117,7 +119,7 @@ extern DelayInterval const DELAY_DAY;
 
 ///// _EventTime /////
 
-class _EventTime: public Timeval {
+class LIVEMEDIA_API _EventTime: public Timeval {
 public:
   _EventTime(unsigned secondsSinceEpoch = 0,
 	    unsigned usecondsSinceEpoch = 0)
@@ -132,7 +134,7 @@ extern _EventTime const THE_END_OF_TIME;
 
 ///// DelayQueueEntry /////
 
-class DelayQueueEntry {
+class LIVEMEDIA_API DelayQueueEntry {
 public:
   virtual ~DelayQueueEntry();
 
@@ -157,7 +159,7 @@ private:
 
 ///// DelayQueue /////
 
-class DelayQueue: public DelayQueueEntry {
+class LIVEMEDIA_API DelayQueue: public DelayQueueEntry {
 public:
   DelayQueue();
   virtual ~DelayQueue();

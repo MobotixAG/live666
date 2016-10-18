@@ -25,7 +25,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "RTSPClient.hh"
 #endif
 
-class RTSPRegisterSender: public RTSPClient {
+class LIVEMEDIA_API RTSPRegisterSender: public RTSPClient {
 public:
   static RTSPRegisterSender*
   createNew(UsageEnvironment& env,

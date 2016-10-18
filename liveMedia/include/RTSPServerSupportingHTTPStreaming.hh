@@ -31,7 +31,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "TCPStreamSink.hh"
 #endif
 
-class RTSPServerSupportingHTTPStreaming: public RTSPServer {
+class LIVEMEDIA_API RTSPServerSupportingHTTPStreaming: public RTSPServer {
 public:
   static RTSPServerSupportingHTTPStreaming* createNew(UsageEnvironment& env, Port rtspPort = 554,
 						      UserAuthenticationDatabase* authDatabase = NULL,

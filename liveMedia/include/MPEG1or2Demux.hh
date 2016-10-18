@@ -27,7 +27,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 class MPEG1or2DemuxedElementaryStream; // forward
 
-class MPEG1or2Demux: public Medium {
+class LIVEMEDIA_API MPEG1or2Demux: public Medium {
 public:
   static MPEG1or2Demux* createNew(UsageEnvironment& env,
 				  FramedSource* inputSource,
@@ -63,7 +63,7 @@ public:
 
   FramedSource* inputSource() const { return fInputSource; }
 
-  class SCR {
+  class LIVEMEDIA_API SCR {
   public:
     SCR();
 

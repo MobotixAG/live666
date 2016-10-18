@@ -33,7 +33,7 @@ class DeviceParameters {
   //%%% TO BE WRITTEN %%%
 };
 
-class DeviceSource: public FramedSource {
+class LIVEMEDIA_API DeviceSource: public FramedSource {
 public:
   static DeviceSource* createNew(UsageEnvironment& env,
 				 DeviceParameters params);

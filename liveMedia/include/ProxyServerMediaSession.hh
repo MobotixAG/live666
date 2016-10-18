@@ -39,7 +39,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // It is used only within the implementation of "ProxyServerMediaSession", but is defined here, in case developers wish to
 // subclass it.
 
-class ProxyRTSPClient: public RTSPClient {
+class LIVEMEDIA_API ProxyRTSPClient: public RTSPClient {
 public:
   ProxyRTSPClient(class ProxyServerMediaSession& ourServerMediaSession, char const* rtspURL,
                   char const* username, char const* password,
@@ -93,7 +93,7 @@ defaultCreateNewProxyRTSPClientFunc(ProxyServerMediaSession& ourServerMediaSessi
 				    portNumBits tunnelOverHTTPPortNum, int verbosityLevel,
 				    int socketNumToServer);
 
-class ProxyServerMediaSession: public ServerMediaSession {
+class LIVEMEDIA_API ProxyServerMediaSession: public ServerMediaSession {
 public:
   static ProxyServerMediaSession* createNew(UsageEnvironment& env,
 					    GenericMediaServer* ourMediaServer, // Note: We can be used by just one server
@@ -178,7 +178,7 @@ private:
 // (For multi-subsession (i.e., audio+video) sessions, the outgoing streams' presentation times retain the same relative
 //  separation as those of the incoming streams.)
 
-class PresentationTimeSubsessionNormalizer: public FramedFilter {
+class LIVEMEDIA_API PresentationTimeSubsessionNormalizer: public FramedFilter {
 public:
   void setRTPSink(RTPSink* rtpSink) { fRTPSink = rtpSink; }
 
@@ -209,7 +209,7 @@ private:
   PresentationTimeSubsessionNormalizer* fNext;
 };
 
-class PresentationTimeSessionNormalizer: public Medium {
+class LIVEMEDIA_API PresentationTimeSessionNormalizer: public Medium {
 public:
   PresentationTimeSessionNormalizer(UsageEnvironment& env);
   virtual ~PresentationTimeSessionNormalizer();

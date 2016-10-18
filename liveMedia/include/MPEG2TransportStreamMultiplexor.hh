@@ -31,7 +31,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #define PID_TABLE_SIZE 256
 
-class MPEG2TransportStreamMultiplexor: public FramedSource {
+class LIVEMEDIA_API MPEG2TransportStreamMultiplexor: public FramedSource {
 protected:
   MPEG2TransportStreamMultiplexor(UsageEnvironment& env);
   virtual ~MPEG2TransportStreamMultiplexor();

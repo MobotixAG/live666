@@ -28,7 +28,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "DigestAuthentication.hh"
 #endif
 
-class RTSPServer: public GenericMediaServer {
+class LIVEMEDIA_API RTSPServer: public GenericMediaServer {
 public:
   static RTSPServer* createNew(UsageEnvironment& env, Port ourPort = 554,
 			       UserAuthenticationDatabase* authDatabase = NULL,
@@ -287,7 +287,7 @@ private:
 
 ////////// A subclass of "RTSPServer" that implements the "REGISTER" command to set up proxying on the specified URL //////////
 
-class RTSPServerWithREGISTERProxying: public RTSPServer {
+class LIVEMEDIA_API RTSPServerWithREGISTERProxying: public RTSPServer {
 public:
   static RTSPServerWithREGISTERProxying* createNew(UsageEnvironment& env, Port ourPort = 554,
 						   UserAuthenticationDatabase* authDatabase = NULL,
