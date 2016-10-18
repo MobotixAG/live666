@@ -15,11 +15,54 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 **********/
 // "liveMedia"
 // Copyright (c) 1996-2016 Live Networks, Inc.  All rights reserved.
-// A special object which, when created, sends a custom RTSP "REGISTER" command to a specified client.
+// Special objects which, when created, sends a custom RTSP "REGISTER" (or "DEREGISTER") command
+// to a specified client.
 // Implementation
 
 #include "RTSPRegisterSender.hh"
 #include <GroupsockHelper.hh> // for MAKE_SOCKADDR_IN
+
+////////// RTSPRegisterOrDeregisterSender implementation /////////
+
+RTSPRegisterOrDeregisterSender
+::RTSPRegisterOrDeregisterSender(UsageEnvironment& env,
+				 char const* remoteClientNameOrAddress, portNumBits remoteClientPortNum,
+				 Authenticator* authenticator,
+				 int verbosityLevel, char const* applicationName)
+  : RTSPClient(env, NULL, verbosityLevel, applicationName, 0, -1),
+    fRemoteClientPortNum(remoteClientPortNum) {
+  // Set up a connection to the remote client.  To do this, we create a fake "rtsp://" URL for it:
+  char const* fakeRTSPURLFmt = "rtsp://%s:%u/";
+  unsigned fakeRTSPURLSize = strlen(fakeRTSPURLFmt) + strlen(remoteClientNameOrAddress) + 5/* max port num len */;
+  char* fakeRTSPURL = new char[fakeRTSPURLSize];
+  sprintf(fakeRTSPURL, fakeRTSPURLFmt, remoteClientNameOrAddress, remoteClientPortNum);
+  setBaseURL(fakeRTSPURL);
+  delete[] fakeRTSPURL;
+
+  if (authenticator != NULL) fCurrentAuthenticator = *authenticator;
+}
+
+RTSPRegisterOrDeregisterSender::~RTSPRegisterOrDeregisterSender() {
+}
+
+RTSPRegisterOrDeregisterSender::RequestRecord_REGISTER_or_DEREGISTER
+::RequestRecord_REGISTER_or_DEREGISTER(unsigned cseq, char const* cmdName,
+				       RTSPClient::responseHandler* rtspResponseHandler,
+				       char const* rtspURLToRegisterOrDeregister,
+				       char const* proxyURLSuffix)
+  : RTSPClient::RequestRecord(cseq, cmdName, rtspResponseHandler),
+    fRTSPURLToRegisterOrDeregister(strDup(rtspURLToRegisterOrDeregister)),
+    fProxyURLSuffix(strDup(proxyURLSuffix)) {
+}
+
+RTSPRegisterOrDeregisterSender::RequestRecord_REGISTER_or_DEREGISTER
+::~RequestRecord_REGISTER_or_DEREGISTER() {
+  delete[] fRTSPURLToRegisterOrDeregister;
+  delete[] fProxyURLSuffix;
+}
+
+
+////////// RTSPRegisterSender implementation /////////
 
 RTSPRegisterSender* RTSPRegisterSender
 ::createNew(UsageEnvironment& env,
@@ -46,18 +89,8 @@ RTSPRegisterSender
 		     RTSPClient::responseHandler* rtspResponseHandler, Authenticator* authenticator,
 		     Boolean requestStreamingViaTCP, char const* proxyURLSuffix, Boolean reuseConnection,
 		     int verbosityLevel, char const* applicationName)
-  : RTSPClient(env, NULL, verbosityLevel, applicationName, 0, -1),
-    fRemoteClientPortNum(remoteClientPortNum) {
-  // Set up a connection to the remote client.  To do this, we create a fake "rtsp://" URL for it:
-  char const* fakeRTSPURLFmt = "rtsp://%s:%u/";
-  unsigned fakeRTSPURLSize = strlen(fakeRTSPURLFmt) + strlen(remoteClientNameOrAddress) + 5/* max port num len */;
-  char* fakeRTSPURL = new char[fakeRTSPURLSize];
-  sprintf(fakeRTSPURL, fakeRTSPURLFmt, remoteClientNameOrAddress, remoteClientPortNum);
-  setBaseURL(fakeRTSPURL);
-  delete[] fakeRTSPURL;
-
+  : RTSPRegisterOrDeregisterSender(env, remoteClientNameOrAddress, remoteClientPortNum, authenticator, verbosityLevel, applicationName) {
   // Send the "REGISTER" request:
-  if (authenticator != NULL) fCurrentAuthenticator = *authenticator;
   (void)sendRequest(new RequestRecord_REGISTER(++fCSeq, rtspResponseHandler,
 					       rtspURLToRegister, reuseConnection, requestStreamingViaTCP, proxyURLSuffix));
 }
@@ -70,7 +103,7 @@ Boolean RTSPRegisterSender::setRequestFields(RequestRecord* request,
 					     char const*& protocolStr,
 					     char*& extraHeaders, Boolean& extraHeadersWereAllocated) {
   if (strcmp(request->commandName(), "REGISTER") == 0) {
-    RequestRecord_REGISTER* request_REGISTER = (RequestRecord_REGISTER*) request;
+    RequestRecord_REGISTER* request_REGISTER = (RequestRecord_REGISTER*)request;
 
     setBaseURL(request_REGISTER->rtspURLToRegister());
     cmdURL = (char*)url();
@@ -110,12 +143,86 @@ Boolean RTSPRegisterSender::setRequestFields(RequestRecord* request,
 RTSPRegisterSender::RequestRecord_REGISTER
 ::RequestRecord_REGISTER(unsigned cseq, RTSPClient::responseHandler* rtspResponseHandler, char const* rtspURLToRegister,
 			 Boolean reuseConnection, Boolean requestStreamingViaTCP, char const* proxyURLSuffix)
-  : RTSPClient::RequestRecord(cseq, "REGISTER", rtspResponseHandler),
-    fRTSPURLToRegister(strDup(rtspURLToRegister)),
-    fReuseConnection(reuseConnection), fRequestStreamingViaTCP(requestStreamingViaTCP), fProxyURLSuffix(strDup(proxyURLSuffix)) {
+  : RTSPRegisterOrDeregisterSender::RequestRecord_REGISTER_or_DEREGISTER(cseq, "REGISTER", rtspResponseHandler, rtspURLToRegister, proxyURLSuffix),
+    fReuseConnection(reuseConnection), fRequestStreamingViaTCP(requestStreamingViaTCP) {
 }
 
 RTSPRegisterSender::RequestRecord_REGISTER::~RequestRecord_REGISTER() {
-  delete[] fRTSPURLToRegister;
-  delete[] fProxyURLSuffix;
+}
+
+
+////////// RTSPDeregisterSender implementation /////////
+
+RTSPDeregisterSender* RTSPDeregisterSender
+::createNew(UsageEnvironment& env,
+	    char const* remoteClientNameOrAddress, portNumBits remoteClientPortNum, char const* rtspURLToDeregister,
+	    RTSPClient::responseHandler* rtspResponseHandler, Authenticator* authenticator,
+	    char const* proxyURLSuffix, int verbosityLevel, char const* applicationName) {
+  return new RTSPDeregisterSender(env, remoteClientNameOrAddress, remoteClientPortNum, rtspURLToDeregister,
+				  rtspResponseHandler, authenticator,
+				  proxyURLSuffix, verbosityLevel, applicationName);
+}
+
+RTSPDeregisterSender
+::RTSPDeregisterSender(UsageEnvironment& env,
+		       char const* remoteClientNameOrAddress, portNumBits remoteClientPortNum, char const* rtspURLToDeregister,
+		     RTSPClient::responseHandler* rtspResponseHandler, Authenticator* authenticator,
+		     char const* proxyURLSuffix,
+		     int verbosityLevel, char const* applicationName)
+  : RTSPRegisterOrDeregisterSender(env, remoteClientNameOrAddress, remoteClientPortNum, authenticator, verbosityLevel, applicationName) {
+  // Send the "DEREGISTER" request:
+  (void)sendRequest(new RequestRecord_DEREGISTER(++fCSeq, rtspResponseHandler,
+						 rtspURLToDeregister, proxyURLSuffix));
+}
+
+RTSPDeregisterSender::~RTSPDeregisterSender() {
+}
+
+Boolean RTSPDeregisterSender::setRequestFields(RequestRecord* request,
+					       char*& cmdURL, Boolean& cmdURLWasAllocated,
+					       char const*& protocolStr,
+					       char*& extraHeaders, Boolean& extraHeadersWereAllocated) {
+  if (strcmp(request->commandName(), "DEREGISTER") == 0) {
+    RequestRecord_DEREGISTER* request_DEREGISTER = (RequestRecord_DEREGISTER*)request;
+
+    setBaseURL(request_DEREGISTER->rtspURLToDeregister());
+    cmdURL = (char*)url();
+    cmdURLWasAllocated = False;
+
+    // Generate the "Transport:" header that will contain our DEREGISTER-specific parameters.  This will be "extraHeaders".
+    // First, generate the "proxy_url_suffix" parameter string, if any:
+    char* proxyURLSuffixParameterStr;
+    if (request_DEREGISTER->proxyURLSuffix() == NULL) {
+      proxyURLSuffixParameterStr = strDup("");
+    } else {
+      char const* proxyURLSuffixParameterFmt = "proxy_url_suffix=%s";
+      unsigned proxyURLSuffixParameterSize = strlen(proxyURLSuffixParameterFmt)
+	+ strlen(request_DEREGISTER->proxyURLSuffix());
+      proxyURLSuffixParameterStr = new char[proxyURLSuffixParameterSize];
+      sprintf(proxyURLSuffixParameterStr, proxyURLSuffixParameterFmt, request_DEREGISTER->proxyURLSuffix());
+    }
+
+    char const* transportHeaderFmt = "Transport: %s\r\n";
+    unsigned transportHeaderSize = strlen(transportHeaderFmt) + strlen(proxyURLSuffixParameterStr);
+    char* transportHeaderStr = new char[transportHeaderSize];
+    sprintf(transportHeaderStr, transportHeaderFmt,
+	    proxyURLSuffixParameterStr);
+    delete[] proxyURLSuffixParameterStr;
+
+    extraHeaders = transportHeaderStr;
+    extraHeadersWereAllocated = True;
+
+    return True;
+  } else {
+    return RTSPClient::setRequestFields(request, cmdURL, cmdURLWasAllocated, protocolStr, extraHeaders, extraHeadersWereAllocated);
+  }
+}
+
+RTSPDeregisterSender::RequestRecord_DEREGISTER
+::RequestRecord_DEREGISTER(unsigned cseq, RTSPClient::responseHandler* rtspResponseHandler, char const* rtspURLToDeregister,
+			   char const* proxyURLSuffix)
+  : RTSPRegisterOrDeregisterSender::RequestRecord_REGISTER_or_DEREGISTER(cseq, "DEREGISTER", rtspResponseHandler, rtspURLToDeregister, proxyURLSuffix) {
+}
+
+RTSPDeregisterSender::RequestRecord_DEREGISTER::~RequestRecord_DEREGISTER() {
 }
