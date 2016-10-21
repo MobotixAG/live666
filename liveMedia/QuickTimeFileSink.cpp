@@ -297,10 +297,10 @@ QuickTimeFileSink::QuickTimeFileSink(UsageEnvironment& env,
   }
 
   // Use the current time as the file's creation and modification
-  // time.  Use Apple's time format: seconds since January 1, 1904
+  // time.  Use Apple's time format: seconds (UTC) since January 1, 1904
 
   gettimeofday(&fStartTime, NULL);
-  fAppleCreationTime = fStartTime.tv_sec - 0x83dac000;
+  fAppleCreationTime = fStartTime.tv_sec - 0x83da4f80;
 
   // Begin by writing a "mdat" atom at the start of the file.
   // (Later, when we've finished copying data to the file, we'll come
