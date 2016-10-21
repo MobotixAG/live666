@@ -74,7 +74,7 @@ private: // redefined virtual functions
   virtual void setStreamScale(unsigned clientSessionId, void* streamToken, float scale);
   virtual void deleteStream(unsigned clientSessionId, void*& streamToken);
 
-  // The virtual functions thare are usually implemented by "ServerMediaSubsession"s:
+  // The virtual functions that are usually implemented by "ServerMediaSubsession"s:
   virtual FramedSource* createNewStreamSource(unsigned clientSessionId,
 					      unsigned& estBitrate);
   virtual RTPSink* createNewRTPSink(Groupsock* rtpGroupsock,
