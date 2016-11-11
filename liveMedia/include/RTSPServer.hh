@@ -1,7 +1,7 @@
 /**********
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the
-Free Software Foundation; either version 2.1 of the License, or (at your
+Free Software Foundation; either version 3 of the License, or (at your
 option) any later version. (See <http://www.gnu.org/copyleft/lesser.html>.)
 
 This library is distributed in the hope that it will be useful, but WITHOUT
@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2016 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2017 Live Networks, Inc.  All rights reserved.
 // A RTSP server
 // C++ header
 
@@ -92,7 +92,9 @@ public:
   Boolean setUpTunnelingOverHTTP(Port httpPort);
       // (Attempts to) enable RTSP-over-HTTP tunneling on the specified port.
       // Returns True iff the specified port can be used in this way (i.e., it's not already being used for a separate HTTP server).
-      // Note: RTSP-over-HTTP tunneling is described in http://developer.apple.com/quicktime/icefloe/dispatch028.html
+      // Note: RTSP-over-HTTP tunneling is described in
+      //  http://mirror.informatimago.com/next/developer.apple.com/quicktime/icefloe/dispatch028.html
+      //  and http://images.apple.com/br/quicktime/pdf/QTSS_Modules.pdf
   portNumBits httpServerPortNum() const; // in host byte order.  (Returns 0 if not present.)
 
 protected:

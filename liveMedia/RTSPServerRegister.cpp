@@ -1,7 +1,7 @@
 /**********
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the
-Free Software Foundation; either version 2.1 of the License, or (at your
+Free Software Foundation; either version 3 of the License, or (at your
 option) any later version. (See <http://www.gnu.org/copyleft/lesser.html>.)
 
 This library is distributed in the hope that it will be useful, but WITHOUT
@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2016 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2017 Live Networks, Inc.  All rights reserved.
 // A RTSP server
 // Implementation of functionality related to the "REGISTER" and "DEREGISTER" commands
 
@@ -22,6 +22,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "RTSPCommon.hh"
 #include "RTSPRegisterSender.hh"
 #include "ProxyServerMediaSession.hh"
+#include "GroupsockHelper.hh"
 
 ////////// Implementation of "RTSPServer::registerStream()": //////////
 
@@ -60,7 +61,10 @@ public:
       struct sockaddr_in remoteAddress;
 
       grabConnection(sock, remoteAddress);
-      if (sock >= 0) (void)fOurServer.createNewClientConnection(sock, remoteAddress);
+      if (sock >= 0) {
+	increaseSendBufferTo(envir(), sock, 50*1024); // in anticipation of streaming over it
+	(void)fOurServer.createNewClientConnection(sock, remoteAddress);
+      }
     }
 
     if (fResponseHandler != NULL) {
@@ -204,12 +208,12 @@ RTSPServer::RTSPClientConnection::ParamsForREGISTER
 ::ParamsForREGISTER(char const* cmd/*"REGISTER" or "DEREGISTER"*/,
 		    RTSPServer::RTSPClientConnection* ourConnection, char const* url, char const* urlSuffix,
 		    Boolean reuseConnection, Boolean deliverViaTCP, char const* proxyURLSuffix)
-  : fCmd(cmd), fOurConnection(ourConnection), fURL(strDup(url)), fURLSuffix(strDup(urlSuffix)),
+  : fCmd(strDup(cmd)), fOurConnection(ourConnection), fURL(strDup(url)), fURLSuffix(strDup(urlSuffix)),
     fReuseConnection(reuseConnection), fDeliverViaTCP(deliverViaTCP), fProxyURLSuffix(strDup(proxyURLSuffix)) {
 }
 
 RTSPServer::RTSPClientConnection::ParamsForREGISTER::~ParamsForREGISTER() {
-  delete[] fURL; delete[] fURLSuffix; delete[] fProxyURLSuffix;
+  delete[] fCmd; delete[] fURL; delete[] fURLSuffix; delete[] fProxyURLSuffix;
 }
 
 void RTSPServer
