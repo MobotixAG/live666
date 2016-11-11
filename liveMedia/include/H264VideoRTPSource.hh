@@ -51,7 +51,7 @@ private:
   unsigned char fCurPacketNALUnitType;
 };
 
-class SPropRecord {
+class LIVEMEDIA_API SPropRecord {
 public:
   ~SPropRecord() { delete[] sPropBytes; }
 
@@ -59,7 +59,7 @@ public:
   unsigned char* sPropBytes;
 };
 
-SPropRecord* parseSPropParameterSets(char const* sPropParameterSetsStr,
+LIVEMEDIA_API SPropRecord* parseSPropParameterSets(char const* sPropParameterSetsStr,
 				     // result parameter:
 				     unsigned& numSPropRecords);
     // Returns the binary value of each 'parameter set' specified in a
