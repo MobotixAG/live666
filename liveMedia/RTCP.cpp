@@ -645,6 +645,7 @@ void RTCPInstance
 #endif
 	    break;
 	  }
+	  length -= 4;
 #ifdef DEBUG
 	  fprintf(stderr, "\tname:%c%c%c%c\n", pkt[0], pkt[1], pkt[2], pkt[3]);
 #endif
