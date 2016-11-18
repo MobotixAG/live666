@@ -108,10 +108,11 @@ void StreamReplicator::deactivateStreamReplica(StreamReplica* replicaBeingDeacti
   // Assert: fNumActiveReplicas > 0
   if (fNumActiveReplicas == 0) fprintf(stderr, "StreamReplicator::deactivateStreamReplica() Internal Error!\n"); // should not happen
   --fNumActiveReplicas;
-  replicaBeingDeactivated->fFrameIndex = -1;
 
   // Forget about any frame delivery that might have just been made to this replica:
   if (replicaBeingDeactivated->fFrameIndex != fFrameIndex && fNumDeliveriesMadeSoFar > 0) --fNumDeliveriesMadeSoFar;
+
+  replicaBeingDeactivated->fFrameIndex = -1;
 
   // Check whether the replica being deactivated is the 'master' replica, or is enqueued awaiting a frame:
   if (replicaBeingDeactivated == fMasterReplica) {
