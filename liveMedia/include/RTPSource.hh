@@ -116,7 +116,7 @@ private:
 
 class RTPReceptionStats; // forward
 
-class RTPReceptionStatsDB {
+class LIVEMEDIA_API RTPReceptionStatsDB {
 public:
   unsigned totNumPacketsReceived() const { return fTotNumPacketsReceived; }
   unsigned numActiveSourcesSinceLastReset() const {
@@ -127,7 +127,7 @@ public:
       // resets periodic stats (called each time they're used to
       // generate a reception report)
 
-  class Iterator {
+  class LIVEMEDIA_API Iterator {
   public:
     Iterator(RTPReceptionStatsDB& receptionStatsDB);
     virtual ~Iterator();
@@ -175,7 +175,7 @@ private:
   unsigned fTotNumPacketsReceived; // for all SSRCs
 };
 
-class RTPReceptionStats {
+class LIVEMEDIA_API RTPReceptionStats {
 public:
   u_int32_t SSRC() const { return fSSRC; }
   unsigned numPacketsReceivedSinceLastReset() const {
@@ -260,7 +260,7 @@ private:
 };
 
 
-Boolean seqNumLT(u_int16_t s1, u_int16_t s2);
+LIVEMEDIA_API Boolean seqNumLT(u_int16_t s1, u_int16_t s2);
   // a 'less-than' on 16-bit sequence numbers
 
 #endif
