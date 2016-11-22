@@ -81,8 +81,8 @@ LIVEMEDIA_API netAddressBits ourIPAddress(UsageEnvironment& env); // in network 
 
 // IP addresses of our sending and receiving interfaces.  (By default, these
 // are INADDR_ANY (i.e., 0), specifying the default interface.)
-extern netAddressBits SendingInterfaceAddr;
-extern netAddressBits ReceivingInterfaceAddr;
+extern LIVEMEDIA_API netAddressBits SendingInterfaceAddr;
+extern LIVEMEDIA_API netAddressBits ReceivingInterfaceAddr;
 
 // Allocates a randomly-chosen IPv4 SSM (multicast) address:
 LIVEMEDIA_API netAddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);
@@ -112,7 +112,7 @@ LIVEMEDIA_API char const* timestampString();
 //            NoReuse dummy;
 //            ...
 //          }
-class NoReuse {
+class LIVEMEDIA_API NoReuse {
 public:
   NoReuse(UsageEnvironment& env);
   ~NoReuse();
@@ -124,25 +124,25 @@ private:
 
 // Define the "UsageEnvironment"-specific "groupsockPriv" structure:
 
-struct _groupsockPriv { // There should be only one of these allocated
+struct LIVEMEDIA_API _groupsockPriv { // There should be only one of these allocated
   HashTable* socketTable;
   int reuseFlag;
 };
-_groupsockPriv* groupsockPriv(UsageEnvironment& env); // allocates it if necessary
-void reclaimGroupsockPriv(UsageEnvironment& env);
+LIVEMEDIA_API _groupsockPriv* groupsockPriv(UsageEnvironment& env); // allocates it if necessary
+LIVEMEDIA_API void reclaimGroupsockPriv(UsageEnvironment& env);
 
 
 #if (defined(__WIN32__) || defined(_WIN32)) && !defined(__MINGW32__)
 // For Windoze, we need to implement our own gettimeofday()
-extern int gettimeofday(struct timeval*, int*);
+extern LIVEMEDIA_API int gettimeofday(struct timeval*, int*);
 #else
 #include <sys/time.h>
 #endif
 
 // The following are implemented in inet.c:
-extern "C" netAddressBits our_inet_addr(char const*);
-extern "C" void our_srandom(int x);
-extern "C" long our_random();
-extern "C" u_int32_t our_random32(); // because "our_random()" returns a 31-bit number
+extern "C" LIVEMEDIA_API netAddressBits our_inet_addr(char const*);
+extern "C" LIVEMEDIA_API void our_srandom(int x);
+extern "C" LIVEMEDIA_API long our_random();
+extern "C" LIVEMEDIA_API u_int32_t our_random32(); // because "our_random()" returns a 31-bit number
 
 #endif
