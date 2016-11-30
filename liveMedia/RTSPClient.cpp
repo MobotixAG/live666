@@ -866,9 +866,10 @@ int RTSPClient::openConnection() {
     }
     
     // We don't yet have a TCP socket (or we used to have one, but it got closed).  Set it up now.
-    fInputSocketNum = fOutputSocketNum = setupStreamSocket(envir(), 0);
+    fInputSocketNum = setupStreamSocket(envir(), 0);
     if (fInputSocketNum < 0) break;
     ignoreSigPipeOnSocket(fInputSocketNum); // so that servers on the same host that get killed don't also kill us
+    if (fOutputSocketNum < 0) fOutputSocketNum = fInputSocketNum;
       
     // Connect to the remote endpoint:
     fServerAddress = *(netAddressBits*)(destAddress.data());
@@ -1748,7 +1749,7 @@ void RTSPClient::handleResponseBytes(int newBytesRead) {
 	    delete[] newBaseURL;
 	  }
 	} else if (checkForHeader(lineStart, "Connection:", 11, headerParamsStr)) {
-	  if (_strncasecmp(headerParamsStr, "Close", 5) == 0) {
+	  if (fTunnelOverHTTPPortNum == 0 && _strncasecmp(headerParamsStr, "Close", 5) == 0) {
 	    resetTCPSockets();
 	  }
 	}
