@@ -81,6 +81,12 @@ public:
   // RTP sequence numbers and timestamps are usually not useful to receivers.
   // (Our implementation of RTP reception already does all needed handling of RTP sequence numbers and timestamps.)
   u_int16_t curPacketRTPSeqNum() const { return fCurPacketRTPSeqNum; }
+
+  // Taken from: http://lists.live555.com/pipermail/live-devel/2009-April/010424.html
+  // This is used to set a callback to retrieve the RTP Header Extension data
+  typedef void (*RtpExtHdrCallback_t)(unsigned definedByProfile, unsigned char* extHdrData, unsigned extHdrDataLen, struct timeval& presentationTime, unsigned short rtpSeqNo, unsigned rtpTimestamp, bool rtpMarkerBitSet, void* pPriv);
+  void setRtpExtHdrCallback( RtpExtHdrCallback_t callback, void* pPriv ) { fRtpExtHdrCallback = callback; fRtpExtHdrCallbackPrivData = pPriv;}
+
 private: friend class MediaSubsession; // "MediaSubsession" is the only outside class that ever needs to see RTP timestamps!
   u_int32_t curPacketRTPTimestamp() const { return fCurPacketRTPTimestamp; }
 
@@ -98,6 +104,9 @@ protected:
   Boolean fCurPacketHasBeenSynchronizedUsingRTCP;
   u_int32_t fLastReceivedSSRC;
   class RTCPInstance* fRTCPInstanceForMultiplexedRTCPPackets;
+
+  RtpExtHdrCallback_t fRtpExtHdrCallback;
+  void* fRtpExtHdrCallbackPrivData;
 
 private:
   // redefined virtual functions:
