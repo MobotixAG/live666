@@ -245,6 +245,7 @@ protected:
 				   char const*& protocolStr,
 				   char*& extraHeaders, Boolean& extraHeadersWereAllocated);
       // used to implement "sendRequest()"; subclasses may reimplement this (e.g., when implementing a new command name)
+  virtual int connectToServer(int socketNum, portNumBits remotePortNum); // used to implement "openConnection()"; result values: -1: failure; 0: pending; 1: success
 
 private: // redefined virtual functions
   virtual Boolean isRTSPClient() const;
@@ -270,8 +271,7 @@ private:
 
   void resetTCPSockets();
   void resetResponseBuffer();
-  int openConnection(); // -1: failure; 0: pending; 1: success
-  int connectToServer(int socketNum, portNumBits remotePortNum); // used to implement "openConnection()"; result values are the same
+  int openConnection(); // result values: -1: failure; 0: pending; 1: success
   char* createAuthenticatorString(char const* cmd, char const* url);
   char* createBlocksizeString(Boolean streamUsingTCP);
   void handleRequestError(RequestRecord* request);
