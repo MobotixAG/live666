@@ -328,7 +328,6 @@ void ProxyRTSPClient::continueAfterLivenessCommand(int resultCode, Boolean serve
       }
     }
 
-
     scheduleReset();
     return;
   }
