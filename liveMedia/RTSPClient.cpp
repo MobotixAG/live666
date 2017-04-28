@@ -870,6 +870,7 @@ int RTSPClient::openConnection() {
     if (fInputSocketNum < 0) break;
     ignoreSigPipeOnSocket(fInputSocketNum); // so that servers on the same host that get killed don't also kill us
     if (fOutputSocketNum < 0) fOutputSocketNum = fInputSocketNum;
+    envir() << "Created new TCP socket " << fInputSocketNum << " for connection\n";
       
     // Connect to the remote endpoint:
     fServerAddress = *(netAddressBits*)(destAddress.data());
@@ -890,7 +891,7 @@ int RTSPClient::openConnection() {
 int RTSPClient::connectToServer(int socketNum, portNumBits remotePortNum) {
   MAKE_SOCKADDR_IN(remoteName, fServerAddress, htons(remotePortNum));
   if (fVerbosityLevel >= 1) {
-    envir() << "Opening connection to " << AddressString(remoteName).val() << ", port " << remotePortNum << "...\n";
+    envir() << "Connecting to " << AddressString(remoteName).val() << ", port " << remotePortNum << " on socket " << socketNum << "...\n";
   }
   if (connect(socketNum, (struct sockaddr*) &remoteName, sizeof remoteName) != 0) {
     int const err = envir().getErrno();
