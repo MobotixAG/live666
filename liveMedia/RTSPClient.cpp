@@ -170,13 +170,17 @@ void RTSPClient::sendDummyUDPPackets(MediaSubsession& subsession, unsigned numDu
   // Hack: To increase the likelihood of UDP packets from the server reaching us,
   // if we're behind a NAT, send a few 'dummy' UDP packets to the server now.
   // (We do this on both our RTP port and our RTCP port.)
-  Groupsock* gs1 = NULL; Groupsock* gs2 = NULL;
+  // TODO: It seems that some newer servers (observed with a current ONVIF camera)
+  // reject all following RTCP Receiver Report packets (which leads to a session
+  // timeout) if the client sent garbage over the RTCP port before
+  // => RTCP sending commented out for now
+  Groupsock* gs1 = NULL;// Groupsock* gs2 = NULL;
   if (subsession.rtpSource() != NULL) gs1 = subsession.rtpSource()->RTPgs();
-  if (subsession.rtcpInstance() != NULL) gs2 = subsession.rtcpInstance()->RTCPgs();
+  //if (subsession.rtcpInstance() != NULL) gs2 = subsession.rtcpInstance()->RTCPgs();
   u_int32_t const dummy = 0xFEEDFACE;
   for (unsigned i = 0; i < numDummyPackets; ++i) {
     if (gs1 != NULL) gs1->output(envir(), (unsigned char*)&dummy, sizeof dummy);
-    if (gs2 != NULL) gs2->output(envir(), (unsigned char*)&dummy, sizeof dummy);
+    //if (gs2 != NULL) gs2->output(envir(), (unsigned char*)&dummy, sizeof dummy);
   }
 }
 
