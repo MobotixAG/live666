@@ -202,10 +202,15 @@ Boolean makeSocketBlocking(int sock, unsigned writeTimeoutInMilliseconds) {
 
   if (writeTimeoutInMilliseconds > 0) {
 #ifdef SO_SNDTIMEO
+#if defined(__WIN32__) || defined(_WIN32)
+    DWORD msto = (DWORD)writeTimeoutInMilliseconds;
+    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&msto, sizeof(msto) );
+#else
     struct timeval tv;
     tv.tv_sec = writeTimeoutInMilliseconds/1000;
     tv.tv_usec = (writeTimeoutInMilliseconds%1000)*1000;
     setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof tv);
+#endif
 #endif
   }
 

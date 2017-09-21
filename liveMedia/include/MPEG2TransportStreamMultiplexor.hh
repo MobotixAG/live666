@@ -47,7 +47,9 @@ protected:
   void handleNewBuffer(unsigned char* buffer, unsigned bufferSize,
 		       int mpegVersion, MPEG1or2Demux::SCR scr, int16_t PID = -1);
       // called by "awaitNewBuffer()"
-      // Note: For MPEG-4 video, set "mpegVersion" to 4; for H.264 video, set "mpegVersion" to 5. 
+      // Note: For MPEG-4 video, set "mpegVersion" to 4; for H.264 video, set "mpegVersion" to 5;
+      //     for H.265 video, set "mpegVersion" to 6.
+      //     For Opus audio, set "mpegVersion" to 3.
       // The buffer is assumed to be a PES packet, with a proper PES header.
       // If "PID" is not -1, then it (currently, only the low 8 bits) is used as the stream's PID,
       // otherwise the "stream_id" in the PES header is reused to be the stream's PID.

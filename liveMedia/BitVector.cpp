@@ -143,7 +143,7 @@ int BitVector::get_expGolombSigned() {
   unsigned codeNum = get_expGolomb();
 
   if ((codeNum&1) == 0) { // even
-    return -(codeNum/2);
+    return -(int)(codeNum/2);
   } else { // odd
     return (codeNum+1)/2;
   }

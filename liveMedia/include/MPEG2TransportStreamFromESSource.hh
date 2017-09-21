@@ -31,8 +31,11 @@ public:
   static MPEG2TransportStreamFromESSource* createNew(UsageEnvironment& env);
 
   void addNewVideoSource(FramedSource* inputSource, int mpegVersion, int16_t PID = -1);
-      // Note: For MPEG-4 video, set "mpegVersion" to 4; for H.264 video, set "mpegVersion" to 5.
+      // Note: For MPEG-4 video, set "mpegVersion" to 4; for H.264 video, set "mpegVersion" to 5;
+      //     for H.265 video, set "mpegVersion" to 6
   void addNewAudioSource(FramedSource* inputSource, int mpegVersion, int16_t PID = -1);
+      // Note: For Opus audio, set "mpegVersion" to 3
+  
       // Note: In these functions, if "PID" is not -1, then it (currently, just the low 8 bits)
       // is used as the stream's PID.  Otherwise (if "PID" is -1) the 'stream_id' is used as
       // the PID.
