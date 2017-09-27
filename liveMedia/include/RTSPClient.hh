@@ -317,6 +317,11 @@ private:
   void handleResponseBytes(int newBytesRead);
 
 public:
+  // Enable or disable RTCP over UDP hack (enabled by default)
+  Boolean sendDummyUDPPacketsOverRTCP() const;
+  void setSendDummyUDPPacketsOverRTCP(Boolean enable);
+
+public:
   u_int16_t desiredMaxIncomingPacketSize;
     // If set to a value >0, then a "Blocksize:" header with this value (minus an allowance for
     // IP, UDP, and RTP headers) will be sent with each "SETUP" request.
@@ -345,6 +350,8 @@ private:
   char fSessionCookie[33];
   unsigned fSessionCookieCounter;
   Boolean fHTTPTunnelingConnectionIsPending;
+
+  Boolean fSendDummyUDPPacketsOverRTCP; // default is 'true'
 };
 
 
