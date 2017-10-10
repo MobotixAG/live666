@@ -302,8 +302,8 @@ void MultiFramedRTPSource::networkReadHandler1() {
       if (bPacket->dataSize() < remExtSize) break;
       if ( RTPSource::fRtpExtHdrCallback )
       {
-        // We cannot send the data to the callback function yet since we need the presentation time which is caculated later.
-           extHdrDataPtr = bPacket->data ();
+        // We cannot send the data to the callback function yet since we need the presentation time which is calculated later.
+        extHdrDataPtr = bPacket->data ();
         extHdrDataSize = remExtSize;
         extHdrDefinedByProfile = extHdr >> 16;
         sendExtHdrData = true;
