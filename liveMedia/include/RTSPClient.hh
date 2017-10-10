@@ -147,6 +147,10 @@ public:
       // Issues an aggregate RTSP "GET_PARAMETER" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
+  char const* requireTag() { return fRequireTag; }
+  void setRequireTag(char const* tag = NULL);
+      // Set the RTSP 'Require:' header tag for the following RTSP commands until it is overwritten by NULL again.
+
   void sendDummyUDPPackets(MediaSession& session, unsigned numDummyPackets = 2);
   void sendDummyUDPPackets(MediaSubsession& subsession, unsigned numDummyPackets = 2);
       // Sends short 'dummy' (i.e., non-RTP or RTCP) UDP packets towards the server, to increase
@@ -345,6 +349,8 @@ private:
   char* fResponseBuffer;
   unsigned fResponseBytesAlreadySeen, fResponseBufferBytesLeft;
   RequestQueue fRequestsAwaitingConnection, fRequestsAwaitingHTTPTunneling, fRequestsAwaitingResponse;
+
+  char* fRequireTag; // current value that is used for all the RTSP commands in the 'Require:' header
 
   // Support for tunneling RTSP-over-HTTP:
   char fSessionCookie[33];

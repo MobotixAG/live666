@@ -157,6 +157,15 @@ unsigned RTSPClient::sendGetParameterCommand(MediaSession& session, responseHand
   return result;
 }
 
+void RTSPClient::setRequireTag(char const* tag) {
+   delete[] fRequireTag;
+   if (tag == NULL) {
+      return;
+   }
+   fRequireTag = new char[strlen(tag)+1];
+   sprintf(fRequireTag, tag);
+}
+
 void RTSPClient::sendDummyUDPPackets(MediaSession& session, unsigned numDummyPackets) {
   MediaSubsessionIterator iter(session);
   MediaSubsession* subsession;
@@ -370,7 +379,7 @@ RTSPClient::RTSPClient(UsageEnvironment& env, char const* rtspURL,
     fTunnelOverHTTPPortNum(tunnelOverHTTPPortNum),
     fUserAgentHeaderStr(NULL), fUserAgentHeaderStrLen(0),
     fInputSocketNum(-1), fOutputSocketNum(-1), fBaseURL(NULL), fTCPStreamIdCount(0),
-    fLastSessionId(NULL), fSessionTimeoutParameter(0), fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False), fSendDummyUDPPacketsOverRTCP(True) {
+    fLastSessionId(NULL), fSessionTimeoutParameter(0), fRequireTag(NULL), fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False), fSendDummyUDPPacketsOverRTCP(True) {
   setBaseURL(rtspURL);
 
   fResponseBuffer = new char[responseBufferSize+1];
@@ -407,6 +416,7 @@ RTSPClient::~RTSPClient() {
 
   delete[] fResponseBuffer;
   delete[] fUserAgentHeaderStr;
+  delete[] fRequireTag;
 }
 
 void RTSPClient::reset() {
@@ -434,6 +444,17 @@ int RTSPClient::grabSocket() {
   fInputSocketNum = -1;
 
   return inputSocket;
+}
+
+static char* createRequireString(char const* requireTag) {
+   char* requireTagStr;
+   if (requireTag != NULL) {
+      requireTagStr = new char[20+strlen(requireTag)];
+      sprintf(requireTagStr, "Require: %s\r\n", requireTag);
+   } else {
+      requireTagStr = strDup("");
+   }
+   return requireTagStr;
 }
 
 unsigned RTSPClient::sendRequest(RequestRecord* request) {
@@ -500,9 +521,12 @@ unsigned RTSPClient::sendRequest(RequestRecord* request) {
 
     char* authenticatorStr = createAuthenticatorString(request->commandName(), fBaseURL);
 
+    char* requireTagStr = createRequireString(fRequireTag);
+
     char const* const cmdFmt =
       "%s %s %s\r\n"
       "CSeq: %d\r\n"
+      "%s"
       "%s"
       "%s"
       "%s"
@@ -514,6 +538,7 @@ unsigned RTSPClient::sendRequest(RequestRecord* request) {
       + 20 /* max int len */
       + strlen(authenticatorStr)
       + fUserAgentHeaderStrLen
+      + strlen(requireTagStr)
       + strlen(extraHeaders)
       + strlen(contentLengthHeader)
       + contentStrLen;
@@ -523,10 +548,12 @@ unsigned RTSPClient::sendRequest(RequestRecord* request) {
 	    request->cseq(),
 	    authenticatorStr,
 	    fUserAgentHeaderStr,
+       requireTagStr,           // add 'Require:' header field, assuming the header order does not matter
             extraHeaders,
 	    contentLengthHeader,
 	    contentStr);
     delete[] authenticatorStr;
+    delete[] requireTagStr;
     if (cmdURLWasAllocated) delete[] cmdURL;
     if (extraHeadersWereAllocated) delete[] extraHeaders;
     if (contentLengthHeaderWasAllocated) delete[] contentLengthHeader;
