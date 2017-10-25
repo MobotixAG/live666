@@ -96,28 +96,30 @@ public:
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   unsigned sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1,
+			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 			   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "PLAY" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (Note: start=-1 means 'resume'; end=-1 means 'play to end')
       // (Note: rateControl=-1 means header field is not sent, rateControl=1 means 'Rate-Control: yes', rateControl=0 means 'Rate-Control: no')
+      // (Note: immediate=-1 means header field is not sent, immediate=1 means 'Immediate: yes', immediate=0 means 'Immediate: no')
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
   unsigned sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1,
+			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 			   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "PLAY" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (Note: start=-1 means 'resume'; end=-1 means 'play to end')
       // (Note: rateControl=-1 means header field is not sent, rateControl=1 means 'Rate-Control: yes', rateControl=0 means 'Rate-Control: no')
+      // (Note: immediate=-1 means header field is not sent, immediate=1 means 'Immediate: yes', immediate=0 means 'Immediate: no')
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   // Alternative forms of "sendPlayCommand()", used to send "PLAY" commands that include an 'absolute' time range:
   // (The "absStartTime" string (and "absEndTime" string, if present) *must* be of the form
   //  "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
   unsigned sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1,
+			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 			   Authenticator* authenticator = NULL, size_t cmdId = 0);
   unsigned sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1,
+			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 			   Authenticator* authenticator = NULL, size_t cmdId = 0);
 
   unsigned sendPauseCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
@@ -204,9 +206,9 @@ public: // Some compilers complain if this is "private:"
   public:
     RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler, size_t cmdId,
 		  MediaSession* session = NULL, MediaSubsession* subsession = NULL, u_int32_t booleanFlags = 0,
-		  double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, char const* contentStr = NULL);
+		  double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1, char const* contentStr = NULL);
     RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId,
-		  char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1,
+		  char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 		  MediaSession* session = NULL, MediaSubsession* subsession = NULL);
         // alternative constructor for creating "PLAY" requests that include 'absolute' time values
     virtual ~RequestRecord();
@@ -223,6 +225,7 @@ public: // Some compilers complain if this is "private:"
     char const* absEndTime() const { return fAbsEndTime; }
     float scale() const { return fScale; }
     int rateControl() const { return fRateControl; }
+    int immediate() const { return fImmediate; }
     char* contentStr() const { return fContentStr; }
     responseHandler*& handler() { return fHandler; }
     size_t cmdId() { return fCmdId; }
@@ -238,6 +241,7 @@ public: // Some compilers complain if this is "private:"
     char *fAbsStartTime, *fAbsEndTime; // used for optional 'absolute' (i.e., "time=") range specifications
     float fScale;
     int fRateControl;
+    int fImmediate;
     char* fContentStr;
     responseHandler* fHandler;
     size_t fCmdId;

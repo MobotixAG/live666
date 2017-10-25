@@ -48,7 +48,7 @@ unsigned RTSPClient::sendOptionsCommand(responseHandler* responseHandler, Authen
 
 unsigned RTSPClient::sendAnnounceCommand(char const* sdpDescription, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "ANNOUNCE", responseHandler, cmdId, NULL, NULL, False, 0.0, 0.0, 0.0, -1, sdpDescription));
+  return sendRequest(new RequestRecord(++fCSeq, "ANNOUNCE", responseHandler, cmdId, NULL, NULL, False, 0.0, 0.0, 0.0, -1, -1, sdpDescription));
 }
 
 unsigned RTSPClient::sendSetupCommand(MediaSubsession& subsession, responseHandler* responseHandler,
@@ -65,35 +65,35 @@ unsigned RTSPClient::sendSetupCommand(MediaSubsession& subsession, responseHandl
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-                                     double start, double end, float scale, int rateControl,
+                                     double start, double end, float scale, int rateControl, int immediate,
                                      Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(session); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, &session, NULL, 0, start, end, scale, rateControl));
+  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, &session, NULL, 0, start, end, scale, rateControl, immediate));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-                                     double start, double end, float scale, int rateControl,
+                                     double start, double end, float scale, int rateControl, int immediate,
                                      Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(subsession); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, NULL, &subsession, 0, start, end, scale, rateControl));
+  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, NULL, &subsession, 0, start, end, scale, rateControl, immediate));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-				     char const* absStartTime, char const* absEndTime, float scale, int rateControl,
+				     char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate,
                                      Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(session); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, &session, NULL));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, immediate, &session, NULL));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-				     char const* absStartTime, char const* absEndTime, float scale, int rateControl,
+				     char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate,
                                      Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(subsession); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, immediate, NULL, &subsession));
 }
 
 unsigned RTSPClient::sendPauseCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
@@ -132,7 +132,7 @@ unsigned RTSPClient::sendSetParameterCommand(MediaSession& session, responseHand
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   char* paramString = new char[strlen(parameterName) + strlen(parameterValue) + 10];
   sprintf(paramString, "%s: %s\r\n", parameterName, parameterValue);
-  unsigned result = sendRequest(new RequestRecord(++fCSeq, "SET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, paramString));
+  unsigned result = sendRequest(new RequestRecord(++fCSeq, "SET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
   delete[] paramString;
   return result;
 }
@@ -152,7 +152,7 @@ unsigned RTSPClient::sendGetParameterCommand(MediaSession& session, responseHand
   } else {
     sprintf(paramString, "%s\r\n", parameterName);
   }
-  unsigned result = sendRequest(new RequestRecord(++fCSeq, "GET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, paramString));
+  unsigned result = sendRequest(new RequestRecord(++fCSeq, "GET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
   delete[] paramString;
   return result;
 }
@@ -624,7 +624,7 @@ static char* createSpeedString(float speed) {
   return strDup(buf);
 }
 
-static char* createRateControl(int rateControl) {
+static char* createRateControlString(int rateControl) {
    char buf[100];
    if (rateControl == 1) {
       sprintf(buf, "Rate-Control: yes\r\n");
@@ -632,6 +632,20 @@ static char* createRateControl(int rateControl) {
       sprintf(buf, "Rate-Control: no\r\n");
    } else {
       // This is the default value; we don't need a "Rate-Control:" header:
+      buf[0] = '\0';
+   }
+
+   return strDup(buf);
+}
+
+static char* createImmediateString(int immediate) {
+   char buf[100];
+   if (immediate == 1) {
+      sprintf(buf, "Immediate: yes\r\n");
+   } else if (immediate == 0) {
+      sprintf(buf, "Immediate: no\r\n");
+   } else {
+      // This is the default value; we don't need a "Immediate:" header:
       buf[0] = '\0';
    }
 
@@ -853,18 +867,19 @@ Boolean RTSPClient::setRequestFields(RequestRecord* request,
     }
     
     if (strcmp(request->commandName(), "PLAY") == 0) {
-      // Create possible "Session:", "Scale:", "Speed:", and "Range:" headers;
+      // Create possible "Session:", "Rate-Control", "Immediate" "Scale:", "Speed:" and "Range:" headers;
       // these make up the 'extra headers':
       char* sessionStr = createSessionString(sessionId);
-      char* rateControlStr = createRateControl(request->rateControl());
+      char* rateControlStr = createRateControlString(request->rateControl());
+      char* immediateStr = createImmediateString(request->immediate());
       char* scaleStr = createScaleString(request->scale(), originalScale);
       float speed = request->session() != NULL ? request->session()->speed() : request->subsession()->speed();
       char* speedStr = createSpeedString(speed);
       char* rangeStr = createRangeString(request->start(), request->end(), request->absStartTime(), request->absEndTime());
-      extraHeaders = new char[strlen(sessionStr) + strlen(rateControlStr) + strlen(scaleStr) + strlen(speedStr) + strlen(rangeStr) + 1];
+      extraHeaders = new char[strlen(sessionStr) + strlen(rateControlStr) + strlen(immediateStr) + strlen(scaleStr) + strlen(speedStr) + strlen(rangeStr) + 1];
       extraHeadersWereAllocated = True;
-      sprintf(extraHeaders, "%s%s%s%s%s", sessionStr, rateControlStr, scaleStr, speedStr, rangeStr);
-      delete[] sessionStr; delete[] rateControlStr; delete[] scaleStr; delete[] speedStr; delete[] rangeStr;
+      sprintf(extraHeaders, "%s%s%s%s%s%s", sessionStr, rateControlStr, immediateStr, scaleStr, speedStr, rangeStr);
+      delete[] sessionStr; delete[] rateControlStr; delete[] immediateStr, delete[] scaleStr; delete[] speedStr; delete[] rangeStr;
     } else {
       // Create a "Session:" header; this makes up our 'extra headers':
       extraHeaders = createSessionString(sessionId);
@@ -1952,16 +1967,16 @@ void RTSPClient::setSendDummyUDPPacketsOverRTCP(Boolean enable)
 
 RTSPClient::RequestRecord::RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler, size_t cmdId,
 					 MediaSession* session, MediaSubsession* subsession, u_int32_t booleanFlags,
-					 double start, double end, float scale, int rateControl, char const* contentStr)
+					 double start, double end, float scale, int rateControl, int immediate, char const* contentStr)
   : fNext(NULL), fCSeq(cseq), fCommandName(commandName), fSession(session), fSubsession(subsession), fBooleanFlags(booleanFlags),
-    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fScale(scale), fRateControl (rateControl), fContentStr(strDup(contentStr)), fHandler(handler), fCmdId(cmdId) {
+    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fScale(scale), fRateControl(rateControl), fImmediate(immediate), fContentStr(strDup(contentStr)), fHandler(handler), fCmdId(cmdId) {
 }
 
 RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId,
-					 char const* absStartTime, char const* absEndTime, float scale, int rateControl,
+					 char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate, 
 					 MediaSession* session, MediaSubsession* subsession)
   : fNext(NULL), fCSeq(cseq), fCommandName("PLAY"), fSession(session), fSubsession(subsession), fBooleanFlags(0),
-    fStart(0.0f), fEnd(-1.0f), fAbsStartTime(strDup(absStartTime)), fAbsEndTime(strDup(absEndTime)), fScale(scale), fRateControl(rateControl),
+    fStart(0.0f), fEnd(-1.0f), fAbsStartTime(strDup(absStartTime)), fAbsEndTime(strDup(absEndTime)), fScale(scale), fRateControl(rateControl), fImmediate(immediate),
     fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
 }
 
