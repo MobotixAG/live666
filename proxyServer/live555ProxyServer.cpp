@@ -38,7 +38,7 @@ char* passwordForREGISTER = NULL;
 
 static RTSPServer* createRTSPServer(Port port) {
   if (proxyREGISTERRequests) {
-    return RTSPServerWithREGISTERProxying::createNew(*env, port, authDB, authDBForREGISTER, 65, streamRTPOverTCP, verbosityLevel);
+    return RTSPServerWithREGISTERProxying::createNew(*env, port, authDB, authDBForREGISTER, 65, streamRTPOverTCP, verbosityLevel, username, password);
   } else {
     return RTSPServer::createNew(*env, port, authDB);
   }
