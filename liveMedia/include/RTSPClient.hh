@@ -122,12 +122,14 @@ public:
 			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 			   Authenticator* authenticator = NULL, size_t cmdId = 0);
 
-  unsigned sendPauseCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
+  unsigned sendPauseCommand(MediaSession& session, responseHandler* responseHandler, char const* absPausePoint = NULL, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "PAUSE" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
-  unsigned sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
+      // (The "absPausePoint" string *must* be of the form "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
+  unsigned sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, char const* absPausePoint = NULL, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "PAUSE" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
+      // (The "absPausePoint" string *must* be of the form "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
 
   unsigned sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "RECORD" command on "session", then returns the "CSeq" sequence number that was used in the command.
@@ -211,6 +213,8 @@ public: // Some compilers complain if this is "private:"
 		  char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 		  MediaSession* session = NULL, MediaSubsession* subsession = NULL);
         // alternative constructor for creating "PLAY" requests that include 'absolute' time values
+    RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, char const* absPausePoint, MediaSession* session = NULL, MediaSubsession* subsession = NULL);
+        // alternative constructor for creating "PAUSE" requests that include an 'absolute' pause point value
     virtual ~RequestRecord();
 
     RequestRecord*& next() { return fNext; }
@@ -223,6 +227,7 @@ public: // Some compilers complain if this is "private:"
     double end() const { return fEnd; }
     char const* absStartTime() const { return fAbsStartTime; }
     char const* absEndTime() const { return fAbsEndTime; }
+    char const* absPausePoint() const { return fAbsPausePoint; }
     float scale() const { return fScale; }
     int rateControl() const { return fRateControl; }
     int immediate() const { return fImmediate; }
@@ -239,6 +244,7 @@ public: // Some compilers complain if this is "private:"
     u_int32_t fBooleanFlags;
     double fStart, fEnd;
     char *fAbsStartTime, *fAbsEndTime; // used for optional 'absolute' (i.e., "time=") range specifications
+    char *fAbsPausePoint; // used for optional 'absolute' (i.e., "time=") range specifications for PAUSE commands
     float fScale;
     int fRateControl;
     int fImmediate;
