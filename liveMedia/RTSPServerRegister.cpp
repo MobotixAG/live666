@@ -26,7 +26,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 ////////// Implementation of "RTSPServer::registerStream()": //////////
 
-static void rtspRegisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString); // forward
+static void rtspRegisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId); // forward
 
 // A class that represents the state of a "REGISTER" request in progress:
 class RegisterRequestRecord: public RTSPRegisterSender {
@@ -54,7 +54,7 @@ public:
     fOurServer.fPendingRegisterOrDeregisterRequests->Remove((char const*)this);
   }
 
-  void handleResponse(int resultCode, char* resultString) {
+  void handleResponse(int resultCode, char* resultString, size_t cmdId) {
     if (resultCode == 0) {
       // The "REGISTER" request succeeded, so use the still-open RTSP socket to await incoming commands from the remote endpoint:
       int sock;
@@ -85,10 +85,10 @@ private:
   RTSPServer::responseHandlerForREGISTER* fResponseHandler;
 };
 
-static void rtspRegisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void rtspRegisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   RegisterRequestRecord* registerRequestRecord = (RegisterRequestRecord*)rtspClient;
 
-  registerRequestRecord->handleResponse(resultCode, resultString);
+  registerRequestRecord->handleResponse(resultCode, resultString, cmdId);
 }
 
 unsigned RTSPServer::registerStream(ServerMediaSession* serverMediaSession,
@@ -115,7 +115,7 @@ unsigned RTSPServer::registerStream(ServerMediaSession* serverMediaSession,
 
 ////////// Implementation of "RTSPServer::deregisterStream()": //////////
 
-static void rtspDeregisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString); // forward
+static void rtspDeregisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId); // forward
 
 // A class that represents the state of a "DEREGISTER" request in progress:
 class DeregisterRequestRecord: public RTSPDeregisterSender {
@@ -142,7 +142,7 @@ public:
     fOurServer.fPendingRegisterOrDeregisterRequests->Remove((char const*)this);
   }
 
-  void handleResponse(int resultCode, char* resultString) {
+  void handleResponse(int resultCode, char* resultString, size_t cmdId) {
     if (fResponseHandler != NULL) {
       // Call our (DEREGISTER-specific) response handler now:
       (*fResponseHandler)(&fOurServer, fRequestId, resultCode, resultString);
@@ -161,10 +161,10 @@ private:
   RTSPServer::responseHandlerForDEREGISTER* fResponseHandler;
 };
 
-static void rtspDeregisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void rtspDeregisterResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   DeregisterRequestRecord* deregisterRequestRecord = (DeregisterRequestRecord*)rtspClient;
 
-  deregisterRequestRecord->handleResponse(resultCode, resultString);
+  deregisterRequestRecord->handleResponse(resultCode, resultString, cmdId);
 }
 
 unsigned RTSPServer::deregisterStream(ServerMediaSession* serverMediaSession,

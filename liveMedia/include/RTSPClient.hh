@@ -36,6 +36,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 #endif
 
+#include <cstddef>  // for size_t
+
 class LIVEMEDIA_API RTSPClient: public Medium {
 public:
   static RTSPClient* createNew(UsageEnvironment& env, char const* rtspURL,
@@ -50,7 +52,7 @@ public:
   //     (In this case, "rtspURL" must point to the socket's endpoint, so that it can be accessed via the socket.)
 
   typedef void (responseHandler)(RTSPClient* rtspClient,
-				 int resultCode, char* resultString);
+				 int resultCode, char* resultString, size_t cmdId);
       // A function that is called in response to a RTSP command.  The parameters are as follows:
       //     "rtspClient": The "RTSPClient" object on which the original command was issued.
       //     "resultCode": If zero, then the command completed successfully.  If non-zero, then the command did not complete
@@ -67,7 +69,7 @@ public:
       //         Note also that this string is dynamically allocated, and must be freed by the handler (or the caller)
       //             - using "delete[]".
 
-  unsigned sendDescribeCommand(responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendDescribeCommand(responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "DESCRIBE" command, then returns the "CSeq" sequence number that was used in the command.
       // The (programmer-supplied) "responseHandler" function is called later to handle the response
       //     (or is called immediately - with an error code - if the command cannot be sent).
@@ -75,11 +77,11 @@ public:
       //     passing an actual parameter that you created by creating an "Authenticator(username, password) object".
       //     (Note that if you supply a non-NULL "authenticator" parameter, you need do this only for the first command you send.)
 
-  unsigned sendOptionsCommand(responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendOptionsCommand(responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "OPTIONS" command, then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
-  unsigned sendAnnounceCommand(char const* sdpDescription, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendAnnounceCommand(char const* sdpDescription, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "ANNOUNCE" command (with "sdpDescription" as parameter),
       //     then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
@@ -88,62 +90,69 @@ public:
 			    Boolean streamOutgoing = False,
 			    Boolean streamUsingTCP = False,
 			    Boolean forceMulticastOnUnspecified = False,
-			    Authenticator* authenticator = NULL);
+			    Authenticator* authenticator = NULL,
+             size_t cmdId = 0);
       // Issues a RTSP "SETUP" command, then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   unsigned sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-			   double start = 0.0f, double end = -1.0f, float scale = 1.0f,
-			   Authenticator* authenticator = NULL);
+			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1,
+			   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "PLAY" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (Note: start=-1 means 'resume'; end=-1 means 'play to end')
+      // (Note: rateControl=-1 means header field is not sent, rateControl=1 means 'Rate-Control: yes', rateControl=0 means 'Rate-Control: no')
+      // (Note: immediate=-1 means header field is not sent, immediate=1 means 'Immediate: yes', immediate=0 means 'Immediate: no')
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
   unsigned sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-			   double start = 0.0f, double end = -1.0f, float scale = 1.0f,
-			   Authenticator* authenticator = NULL);
+			   double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1,
+			   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "PLAY" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (Note: start=-1 means 'resume'; end=-1 means 'play to end')
+      // (Note: rateControl=-1 means header field is not sent, rateControl=1 means 'Rate-Control: yes', rateControl=0 means 'Rate-Control: no')
+      // (Note: immediate=-1 means header field is not sent, immediate=1 means 'Immediate: yes', immediate=0 means 'Immediate: no')
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   // Alternative forms of "sendPlayCommand()", used to send "PLAY" commands that include an 'absolute' time range:
   // (The "absStartTime" string (and "absEndTime" string, if present) *must* be of the form
   //  "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
   unsigned sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
-			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f,
-			   Authenticator* authenticator = NULL);
+			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
+			   Authenticator* authenticator = NULL, size_t cmdId = 0);
   unsigned sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
-			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f,
-			   Authenticator* authenticator = NULL);
+			   char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
+			   Authenticator* authenticator = NULL, size_t cmdId = 0);
 
-  unsigned sendPauseCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendPauseCommand(MediaSession& session, responseHandler* responseHandler, char const* absPausePoint = NULL, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "PAUSE" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
-  unsigned sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+      // (The "absPausePoint" string *must* be of the form "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
+  unsigned sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, char const* absPausePoint = NULL, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "PAUSE" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
+      // (The "absPausePoint" string *must* be of the form "YYYYMMDDTHHMMSSZ" or "YYYYMMDDTHHMMSS.<frac>Z")
 
-  unsigned sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "RECORD" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
-  unsigned sendRecordCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendRecordCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "RECORD" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
-  unsigned sendTeardownCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendTeardownCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "TEARDOWN" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
-  unsigned sendTeardownCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL);
+  unsigned sendTeardownCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues a RTSP "TEARDOWN" command on "subsession", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   unsigned sendSetParameterCommand(MediaSession& session, responseHandler* responseHandler,
 				   char const* parameterName, char const* parameterValue,
-				   Authenticator* authenticator = NULL);
+				   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "SET_PARAMETER" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
   unsigned sendGetParameterCommand(MediaSession& session, responseHandler* responseHandler, char const* parameterName,
-				   Authenticator* authenticator = NULL);
+				   Authenticator* authenticator = NULL, size_t cmdId = 0);
       // Issues an aggregate RTSP "GET_PARAMETER" command on "session", then returns the "CSeq" sequence number that was used in the command.
       // (The "responseHandler" and "authenticator" parameters are as described for "sendDescribeCommand".)
 
@@ -197,13 +206,15 @@ public: // Some compilers complain if this is "private:"
   // The state of a request-in-progress:
   class RequestRecord {
   public:
-    RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler,
+    RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler, size_t cmdId,
 		  MediaSession* session = NULL, MediaSubsession* subsession = NULL, u_int32_t booleanFlags = 0,
-		  double start = 0.0f, double end = -1.0f, float scale = 1.0f, char const* contentStr = NULL);
-    RequestRecord(unsigned cseq, responseHandler* handler,
-		  char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f,
+		  double start = 0.0f, double end = -1.0f, float scale = 1.0f, int rateControl = -1, int immediate = -1, char const* contentStr = NULL);
+    RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId,
+		  char const* absStartTime, char const* absEndTime = NULL, float scale = 1.0f, int rateControl = -1, int immediate = -1,
 		  MediaSession* session = NULL, MediaSubsession* subsession = NULL);
         // alternative constructor for creating "PLAY" requests that include 'absolute' time values
+    RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, char const* absPausePoint, MediaSession* session = NULL, MediaSubsession* subsession = NULL);
+        // alternative constructor for creating "PAUSE" requests that include an 'absolute' pause point value
     virtual ~RequestRecord();
 
     RequestRecord*& next() { return fNext; }
@@ -216,9 +227,13 @@ public: // Some compilers complain if this is "private:"
     double end() const { return fEnd; }
     char const* absStartTime() const { return fAbsStartTime; }
     char const* absEndTime() const { return fAbsEndTime; }
+    char const* absPausePoint() const { return fAbsPausePoint; }
     float scale() const { return fScale; }
+    int rateControl() const { return fRateControl; }
+    int immediate() const { return fImmediate; }
     char* contentStr() const { return fContentStr; }
     responseHandler*& handler() { return fHandler; }
+    size_t cmdId() { return fCmdId; }
 
   private:
     RequestRecord* fNext;
@@ -229,9 +244,13 @@ public: // Some compilers complain if this is "private:"
     u_int32_t fBooleanFlags;
     double fStart, fEnd;
     char *fAbsStartTime, *fAbsEndTime; // used for optional 'absolute' (i.e., "time=") range specifications
+    char *fAbsPausePoint; // used for optional 'absolute' (i.e., "time=") range specifications for PAUSE commands
     float fScale;
+    int fRateControl;
+    int fImmediate;
     char* fContentStr;
     responseHandler* fHandler;
+    size_t fCmdId;
   };
 
 protected:
@@ -307,7 +326,7 @@ private:
 
   // Support for tunneling RTSP-over-HTTP:
   Boolean setupHTTPTunneling1(); // send the HTTP "GET"
-  static void responseHandlerForHTTP_GET(RTSPClient* rtspClient, int responseCode, char* responseString);
+  static void responseHandlerForHTTP_GET(RTSPClient* rtspClient, int responseCode, char* responseString, size_t cmdId);
   void responseHandlerForHTTP_GET1(int responseCode, char* responseString);
   Boolean setupHTTPTunneling2(); // send the HTTP "POST"
 

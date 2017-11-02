@@ -193,7 +193,7 @@ void ProxyServerMediaSession::resetDESCRIBEState() {
 
 ///////// RTSP 'response handlers' //////////
 
-static void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   char const* res;
 
   if (resultCode == 0) {
@@ -207,17 +207,17 @@ static void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* 
   delete[] resultString;
 }
 
-static void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   ((ProxyRTSPClient*)rtspClient)->continueAfterSETUP(resultCode);
   delete[] resultString;
 }
 
-static void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   ((ProxyRTSPClient*)rtspClient)->continueAfterPLAY(resultCode);
   delete[] resultString;
 }
 
-static void continueAfterOPTIONS(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void continueAfterOPTIONS(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   Boolean serverSupportsGetParameter = False;
   if (resultCode == 0) {
     // Note whether the server told us that it supports the "GET_PARAMETER" command:
@@ -228,7 +228,7 @@ static void continueAfterOPTIONS(RTSPClient* rtspClient, int resultCode, char* r
 }
 
 #ifdef SEND_GET_PARAMETER_IF_SUPPORTED
-static void continueAfterGET_PARAMETER(RTSPClient* rtspClient, int resultCode, char* resultString) {
+static void continueAfterGET_PARAMETER(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId) {
   ((ProxyRTSPClient*)rtspClient)->continueAfterLivenessCommand(resultCode, True);
   delete[] resultString;
 }
@@ -367,14 +367,14 @@ void ProxyRTSPClient::continueAfterSETUP(int resultCode) {
     // There are still entries in the queue, for tracks for which we have still to do a "SETUP".
     // "SETUP" the first of these now:
     sendSetupCommand(fSetupQueueHead->fClientMediaSubsession, ::continueAfterSETUP,
-		     False, fStreamRTPOverTCP, False, fOurAuthenticator);
+		     False, fStreamRTPOverTCP, False, fOurAuthenticator, 0);
     ++fNumSetupsDone;
     fSetupQueueHead->fHaveSetupStream = True;
   } else {
     if (fNumSetupsDone >= smss->fParentSession->numSubsessions()) {
       // We've now finished setting up each of our subsessions (i.e., 'tracks').
       // Continue by sending a "PLAY" command (an 'aggregate' "PLAY" command, on the whole session):
-      sendPlayCommand(smss->fClientMediaSubsession.parentSession(), ::continueAfterPLAY, -1.0f, -1.0f, 1.0f, fOurAuthenticator);
+      sendPlayCommand(smss->fClientMediaSubsession.parentSession(), ::continueAfterPLAY, -1.0f, -1.0f, 1.0f, -1, -1, fOurAuthenticator, 0);
           // the "-1.0f" "start" parameter causes the "PLAY" to be sent without a "Range:" header, in case we'd already done
           // a "PLAY" before (as a result of a 'subsession timeout' (note below))
       fLastCommandWasPLAY = True;
@@ -430,7 +430,7 @@ void ProxyRTSPClient::sendLivenessCommand(void* clientData) {
     rtspClient->sendGetParameterCommand(*sess, ::continueAfterGET_PARAMETER, "", rtspClient->auth());
   } else {
 #endif
-    rtspClient->sendOptionsCommand(::continueAfterOPTIONS, rtspClient->auth());
+    rtspClient->sendOptionsCommand(::continueAfterOPTIONS, rtspClient->auth(), 0);
 #ifdef SEND_GET_PARAMETER_IF_SUPPORTED
   }
 #endif
@@ -478,7 +478,7 @@ void ProxyRTSPClient::scheduleDESCRIBECommand() {
 
 void ProxyRTSPClient::sendDESCRIBE(void* clientData) {
   ProxyRTSPClient* rtspClient = (ProxyRTSPClient*)clientData;
-  if (rtspClient != NULL) rtspClient->sendDescribeCommand(::continueAfterDESCRIBE, rtspClient->auth());
+  if (rtspClient != NULL) rtspClient->sendDescribeCommand(::continueAfterDESCRIBE, rtspClient->auth(), 0);
 }
 
 void ProxyRTSPClient::subsessionTimeout(void* clientData) {
@@ -488,7 +488,7 @@ void ProxyRTSPClient::subsessionTimeout(void* clientData) {
 void ProxyRTSPClient::handleSubsessionTimeout() {
   // We still have one or more subsessions ('tracks') left to "SETUP".  But we can't wait any longer for them.  Send a "PLAY" now:
   MediaSession* sess = fOurServerMediaSession.fClientMediaSession;
-  if (sess != NULL) sendPlayCommand(*sess, ::continueAfterPLAY, -1.0f, -1.0f, 1.0f, fOurAuthenticator);
+  if (sess != NULL) sendPlayCommand(*sess, ::continueAfterPLAY, -1.0f, -1.0f, 1.0f, -1, -1, fOurAuthenticator, 0);
   fLastCommandWasPLAY = True;
 }
 
@@ -607,7 +607,7 @@ FramedSource* ProxyServerMediaSubsession::createNewStreamSource(unsigned clientS
       // the server might not properly handle 'pipelined' requests.  Instead, wait until after previous "SETUP" responses come back.
       if (queueWasEmpty) {
 	proxyRTSPClient->sendSetupCommand(fClientMediaSubsession, ::continueAfterSETUP,
-					  False, proxyRTSPClient->fStreamRTPOverTCP, False, proxyRTSPClient->auth());
+					  False, proxyRTSPClient->fStreamRTPOverTCP, False, proxyRTSPClient->auth(), 0);
 	++proxyRTSPClient->fNumSetupsDone;
 	fHaveSetupStream = True;
       }
@@ -617,7 +617,7 @@ FramedSource* ProxyServerMediaSubsession::createNewStreamSource(unsigned clientS
       // to resume the stream:
       if (!proxyRTSPClient->fLastCommandWasPLAY) { // so that we send only one "PLAY"; not one for each subsession
 	proxyRTSPClient->sendPlayCommand(fClientMediaSubsession.parentSession(), ::continueAfterPLAY, -1.0f/*resume from previous point*/,
-					 -1.0f, 1.0f, proxyRTSPClient->auth());
+					 -1.0f, 1.0f, -1, -1, proxyRTSPClient->auth());
 	proxyRTSPClient->fLastCommandWasPLAY = True;
       }
     }
@@ -643,11 +643,11 @@ void ProxyServerMediaSubsession::closeStreamSource(FramedSource* inputSource) {
       if (fParentSession->referenceCount() > 1) {
 	// There are other client(s) still streaming other subsessions of this stream.
 	// Therefore, we don't send a "PAUSE" for the whole stream, but only for the sub-stream:
-	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession, NULL, proxyRTSPClient->auth());
+	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession, NULL, NULL, proxyRTSPClient->auth());
       } else {
 	// Normal case: There are no other client still streaming (parts of) this stream.
 	// Send a "PAUSE" for the whole stream.
-	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession.parentSession(), NULL, proxyRTSPClient->auth());
+	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession.parentSession(), NULL, NULL, proxyRTSPClient->auth());
 	proxyRTSPClient->fLastCommandWasPLAY = False;
       }
     }
