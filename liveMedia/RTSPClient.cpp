@@ -96,14 +96,14 @@ unsigned RTSPClient::sendPlayCommand(MediaSubsession& subsession, responseHandle
   return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, immediate, NULL, &subsession));
 }
 
-unsigned RTSPClient::sendPauseCommand(MediaSession& session, responseHandler* responseHandler, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendPauseCommand(MediaSession& session, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absPausePoint, &session));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, pausePoint, absPausePoint, &session));
 }
 
-unsigned RTSPClient::sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absPausePoint, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, pausePoint, absPausePoint, NULL, &subsession));
 }
 
 unsigned RTSPClient::sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
@@ -698,14 +698,17 @@ static char* createRangeString(double start, double end, char const* absStartTim
   return strDup(buf);
 }
 
-static char* createRangeString(char const* absPauseTime) {
+static char* createRangeString(double pauseTime, char const* absPauseTime) {
    char buf[100];
    if (absPauseTime != NULL) {
       // Create a "Range:" header that specifies an 'absolute' time value:
       snprintf(buf, sizeof buf, "Range: clock=%s\r\n", absPauseTime);
+   } else if ( pauseTime < 0 ) {
+      // There's no "Range:" header at all
+      buf[0] = '\0';
    } else {
       // This is the default value; we don't need a "Range:" header:
-      buf[0] = '\0';
+      sprintf(buf, "Range: npt=%.3f\r\n", pauseTime);
    }    
 
    return strDup(buf);
@@ -897,7 +900,7 @@ Boolean RTSPClient::setRequestFields(RequestRecord* request,
        // Create possible "Session:" and "Range:" headers;
        // these make up the 'extra headers':
        char* sessionStr = createSessionString(sessionId);
-       char* rangeStr = createRangeString(request->absPausePoint());
+       char* rangeStr = createRangeString(request->pausePoint(), request->absPausePoint());
        extraHeaders = new char[strlen(sessionStr) + strlen(rangeStr) + 1];
        extraHeadersWereAllocated = True;
        sprintf(extraHeaders, "%s%s", sessionStr, rangeStr);
@@ -1991,22 +1994,21 @@ RTSPClient::RequestRecord::RequestRecord(unsigned cseq, char const* commandName,
 					 MediaSession* session, MediaSubsession* subsession, u_int32_t booleanFlags,
 					 double start, double end, float scale, int rateControl, int immediate, char const* contentStr)
   : fNext(NULL), fCSeq(cseq), fCommandName(commandName), fSession(session), fSubsession(subsession), fBooleanFlags(booleanFlags),
-    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(NULL), fScale(scale), fRateControl(rateControl), fImmediate(immediate), fContentStr(strDup(contentStr)), fHandler(handler), fCmdId(cmdId) {
+    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(NULL), fPausePoint(-1.0), fScale(scale), fRateControl(rateControl), fImmediate(immediate), fContentStr(strDup(contentStr)), fHandler(handler), fCmdId(cmdId) {
 }
 
 RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId,
 					 char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate, 
 					 MediaSession* session, MediaSubsession* subsession)
   : fNext(NULL), fCSeq(cseq), fCommandName("PLAY"), fSession(session), fSubsession(subsession), fBooleanFlags(0),
-    fStart(0.0f), fEnd(-1.0f), fAbsStartTime(strDup(absStartTime)), fAbsEndTime(strDup(absEndTime)), fAbsPausePoint(NULL), fScale(scale), fRateControl(rateControl), fImmediate(immediate),
+    fStart(0.0f), fEnd(-1.0f), fAbsStartTime(strDup(absStartTime)), fAbsEndTime(strDup(absEndTime)), fAbsPausePoint(NULL), fPausePoint(-1.0), fScale(scale), fRateControl(rateControl), fImmediate(immediate),
     fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
 }
 
-RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, char const* absPausePoint, MediaSession* session, MediaSubsession* subsession)
+RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, double pausePoint, char const* absPausePoint, MediaSession* session, MediaSubsession* subsession)
    : fNext(NULL), fCSeq(cseq), fCommandName("PAUSE"), fSession(session), fSubsession(subsession), fBooleanFlags(0),
-   fStart(0.0f), fEnd(-1.0f), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(strDup(absPausePoint)), fScale(1.0f), fRateControl(-1), fImmediate(-1), fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
+   fStart(0.0f), fEnd(-1.0f), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(strDup(absPausePoint)), fPausePoint(pausePoint), fScale(1.0f), fRateControl(-1), fImmediate(-1), fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
 }
-
 
 RTSPClient::RequestRecord::~RequestRecord() {
   // Delete the rest of the list first:
