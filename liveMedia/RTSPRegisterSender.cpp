@@ -50,7 +50,7 @@ RTSPRegisterOrDeregisterSender::RequestRecord_REGISTER_or_DEREGISTER
 				       RTSPClient::responseHandler* rtspResponseHandler,
 				       char const* rtspURLToRegisterOrDeregister,
 				       char const* proxyURLSuffix)
-  : RTSPClient::RequestRecord(cseq, cmdName, rtspResponseHandler, 0),
+  : RTSPClient::RequestRecord(cseq, cmdName, rtspResponseHandler, 0, False),
     fRTSPURLToRegisterOrDeregister(strDup(rtspURLToRegisterOrDeregister)),
     fProxyURLSuffix(strDup(proxyURLSuffix)) {
 }
