@@ -36,24 +36,24 @@ RTSPClient* RTSPClient::createNew(UsageEnvironment& env, char const* rtspURL,
 			verbosityLevel, applicationName, tunnelOverHTTPPortNum, socketNumToServer);
 }
 
-unsigned RTSPClient::sendDescribeCommand(responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendDescribeCommand(responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "DESCRIBE", responseHandler, cmdId));
+  return sendRequest(new RequestRecord(++fCSeq, "DESCRIBE", responseHandler, cmdId, suppressMessage));
 }
 
-unsigned RTSPClient::sendOptionsCommand(responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendOptionsCommand(responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (authenticator != NULL) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "OPTIONS", responseHandler, cmdId));
+  return sendRequest(new RequestRecord(++fCSeq, "OPTIONS", responseHandler, cmdId, suppressMessage));
 }
 
-unsigned RTSPClient::sendAnnounceCommand(char const* sdpDescription, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendAnnounceCommand(char const* sdpDescription, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "ANNOUNCE", responseHandler, cmdId, NULL, NULL, False, 0.0, 0.0, 0.0, -1, -1, sdpDescription));
+  return sendRequest(new RequestRecord(++fCSeq, "ANNOUNCE", responseHandler, cmdId, suppressMessage, NULL, NULL, False, 0.0, 0.0, 0.0, -1, -1, sdpDescription));
 }
 
 unsigned RTSPClient::sendSetupCommand(MediaSubsession& subsession, responseHandler* responseHandler,
                                       Boolean streamOutgoing, Boolean streamUsingTCP, Boolean forceMulticastOnUnspecified,
-				      Authenticator* authenticator, size_t cmdId) {
+				      Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fTunnelOverHTTPPortNum != 0) streamUsingTCP = True; // RTSP-over-HTTP tunneling uses TCP (by definition)
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
 
@@ -61,84 +61,84 @@ unsigned RTSPClient::sendSetupCommand(MediaSubsession& subsession, responseHandl
   if (streamUsingTCP) booleanFlags |= 0x1;
   if (streamOutgoing) booleanFlags |= 0x2;
   if (forceMulticastOnUnspecified) booleanFlags |= 0x4;
-  return sendRequest(new RequestRecord(++fCSeq, "SETUP", responseHandler, cmdId, NULL, &subsession, booleanFlags));
+  return sendRequest(new RequestRecord(++fCSeq, "SETUP", responseHandler, cmdId, suppressMessage, NULL, &subsession, booleanFlags));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
                                      double start, double end, float scale, int rateControl, int immediate,
-                                     Authenticator* authenticator, size_t cmdId) {
+                                     Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(session); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, &session, NULL, 0, start, end, scale, rateControl, immediate));
+  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, suppressMessage, &session, NULL, 0, start, end, scale, rateControl, immediate));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
                                      double start, double end, float scale, int rateControl, int immediate,
-                                     Authenticator* authenticator, size_t cmdId) {
+                                     Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(subsession); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, NULL, &subsession, 0, start, end, scale, rateControl, immediate));
+  return sendRequest(new RequestRecord(++fCSeq, "PLAY", responseHandler, cmdId, suppressMessage, NULL, &subsession, 0, start, end, scale, rateControl, immediate));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSession& session, responseHandler* responseHandler,
 				     char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate,
-                                     Authenticator* authenticator, size_t cmdId) {
+                                     Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(session); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, immediate, &session, NULL));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, suppressMessage, absStartTime, absEndTime, scale, rateControl, immediate, &session, NULL));
 }
 
 unsigned RTSPClient::sendPlayCommand(MediaSubsession& subsession, responseHandler* responseHandler,
 				     char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate,
-                                     Authenticator* authenticator, size_t cmdId) {
+                                     Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   sendDummyUDPPackets(subsession); // hack to improve NAT traversal
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, absStartTime, absEndTime, scale, rateControl, immediate, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, suppressMessage, absStartTime, absEndTime, scale, rateControl, immediate, NULL, &subsession));
 }
 
-unsigned RTSPClient::sendPauseCommand(MediaSession& session, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendPauseCommand(MediaSession& session, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, pausePoint, absPausePoint, &session));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, suppressMessage, pausePoint, absPausePoint, &session));
 }
 
-unsigned RTSPClient::sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendPauseCommand(MediaSubsession& subsession, responseHandler* responseHandler, double pausePoint, char const* absPausePoint, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, pausePoint, absPausePoint, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, responseHandler, cmdId, suppressMessage, pausePoint, absPausePoint, NULL, &subsession));
 }
 
-unsigned RTSPClient::sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendRecordCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "RECORD", responseHandler, cmdId, &session));
+  return sendRequest(new RequestRecord(++fCSeq, "RECORD", responseHandler, cmdId, suppressMessage, &session));
 }
 
-unsigned RTSPClient::sendRecordCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendRecordCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "RECORD", responseHandler, cmdId, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, "RECORD", responseHandler, cmdId, suppressMessage,NULL, &subsession));
 }
 
-unsigned RTSPClient::sendTeardownCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendTeardownCommand(MediaSession& session, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "TEARDOWN", responseHandler, cmdId, &session));
+  return sendRequest(new RequestRecord(++fCSeq, "TEARDOWN", responseHandler, cmdId, suppressMessage,&session));
 }
 
-unsigned RTSPClient::sendTeardownCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId) {
+unsigned RTSPClient::sendTeardownCommand(MediaSubsession& subsession, responseHandler* responseHandler, Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
-  return sendRequest(new RequestRecord(++fCSeq, "TEARDOWN", responseHandler, cmdId, NULL, &subsession));
+  return sendRequest(new RequestRecord(++fCSeq, "TEARDOWN", responseHandler, cmdId, suppressMessage, NULL, &subsession));
 }
 
 unsigned RTSPClient::sendSetParameterCommand(MediaSession& session, responseHandler* responseHandler,
                                              char const* parameterName, char const* parameterValue,
-                                             Authenticator* authenticator, size_t cmdId) {
+                                             Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   char* paramString = new char[strlen(parameterName) + strlen(parameterValue) + 10];
   sprintf(paramString, "%s: %s\r\n", parameterName, parameterValue);
-  unsigned result = sendRequest(new RequestRecord(++fCSeq, "SET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
+  unsigned result = sendRequest(new RequestRecord(++fCSeq, "SET_PARAMETER", responseHandler, cmdId, suppressMessage, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
   delete[] paramString;
   return result;
 }
 
 unsigned RTSPClient::sendGetParameterCommand(MediaSession& session, responseHandler* responseHandler, char const* parameterName,
-                                             Authenticator* authenticator, size_t cmdId) {
+                                             Authenticator* authenticator, size_t cmdId, Boolean suppressMessage) {
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
 
   // We assume that:
@@ -152,7 +152,7 @@ unsigned RTSPClient::sendGetParameterCommand(MediaSession& session, responseHand
   } else {
     sprintf(paramString, "%s\r\n", parameterName);
   }
-  unsigned result = sendRequest(new RequestRecord(++fCSeq, "GET_PARAMETER", responseHandler, cmdId, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
+  unsigned result = sendRequest(new RequestRecord(++fCSeq, "GET_PARAMETER", responseHandler, cmdId, suppressMessage, &session, NULL, False, 0.0, 0.0, 0.0, -1, -1, paramString));
   delete[] paramString;
   return result;
 }
@@ -1070,7 +1070,7 @@ void RTSPClient::handleRequestError(RequestRecord* request) {
     resultCode = -ENOTCONN;
 #endif
   }
-  if (request->handler() != NULL) (*request->handler())(this, resultCode, strDup(envir().getResultMsg()), request->cmdId());
+  if (request->handler() != NULL) (*request->handler())(this, resultCode, strDup(envir().getResultMsg()), request->cmdId(), request->suppressMessage());
 }
 
 Boolean RTSPClient
@@ -1538,10 +1538,10 @@ Boolean RTSPClient::setupHTTPTunneling1() {
   }
 
   // Begin by sending a HTTP "GET", to set up the server->client link.  Continue when we handle the response:
-  return sendRequest(new RequestRecord(1, "GET", responseHandlerForHTTP_GET, 0)) != 0;
+  return sendRequest(new RequestRecord(1, "GET", responseHandlerForHTTP_GET, 0, False)) != 0;
 }
 
-void RTSPClient::responseHandlerForHTTP_GET(RTSPClient* rtspClient, int responseCode, char* responseString, size_t cmdId) {
+void RTSPClient::responseHandlerForHTTP_GET(RTSPClient* rtspClient, int responseCode, char* responseString, size_t cmdId, Boolean suppressMessage) {
   if (rtspClient != NULL) rtspClient->responseHandlerForHTTP_GET1(responseCode, responseString);
 }
 
@@ -1593,7 +1593,7 @@ Boolean RTSPClient::setupHTTPTunneling2() {
   fHTTPTunnelingConnectionIsPending = False;
 
   // Send a HTTP "POST", to set up the client->server link.  (Note that we won't see a reply to the "POST".)
-  return sendRequest(new RequestRecord(1, "POST", NULL, 0)) != 0;
+  return sendRequest(new RequestRecord(1, "POST", NULL, 0, False)) != 0;
 }
 
 void RTSPClient::connectionHandler(void* instance, int /*mask*/) {
@@ -1965,7 +1965,7 @@ void RTSPClient::handleResponseBytes(int newBytesRead) {
 	  resultString = strDup(responseStr);
 	  envir().setResultMsg(responseStr);
 	}
-	(*foundRequest->handler())(this, resultCode, resultString, foundRequest->cmdId());
+	(*foundRequest->handler())(this, resultCode, resultString, foundRequest->cmdId(), foundRequest->suppressMessage());
       } else {
 	// An error occurred parsing the response, so call the handler, indicating an error:
 	handleRequestError(foundRequest);
@@ -1990,24 +1990,26 @@ void RTSPClient::setSendDummyUDPPacketsOverRTCP(Boolean enable)
 
 ////////// RTSPClient::RequestRecord implementation //////////
 
-RTSPClient::RequestRecord::RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler, size_t cmdId,
+RTSPClient::RequestRecord::RequestRecord(unsigned cseq, char const* commandName, responseHandler* handler, size_t cmdId, Boolean suppressMessage,
 					 MediaSession* session, MediaSubsession* subsession, u_int32_t booleanFlags,
 					 double start, double end, float scale, int rateControl, int immediate, char const* contentStr)
   : fNext(NULL), fCSeq(cseq), fCommandName(commandName), fSession(session), fSubsession(subsession), fBooleanFlags(booleanFlags),
-    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(NULL), fPausePoint(-1.0), fScale(scale), fRateControl(rateControl), fImmediate(immediate), fContentStr(strDup(contentStr)), fHandler(handler), fCmdId(cmdId) {
+    fStart(start), fEnd(end), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(NULL), fPausePoint(-1.0), fScale(scale), fRateControl(rateControl), fImmediate(immediate), fContentStr(strDup(contentStr)), fHandler(handler), 
+    fCmdId(cmdId), fSuppressMessage(suppressMessage) {
 }
 
-RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId,
+RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, Boolean suppressMessage,
 					 char const* absStartTime, char const* absEndTime, float scale, int rateControl, int immediate, 
 					 MediaSession* session, MediaSubsession* subsession)
   : fNext(NULL), fCSeq(cseq), fCommandName("PLAY"), fSession(session), fSubsession(subsession), fBooleanFlags(0),
     fStart(0.0f), fEnd(-1.0f), fAbsStartTime(strDup(absStartTime)), fAbsEndTime(strDup(absEndTime)), fAbsPausePoint(NULL), fPausePoint(-1.0), fScale(scale), fRateControl(rateControl), fImmediate(immediate),
-    fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
+    fContentStr(NULL), fHandler(handler), fCmdId(cmdId), fSuppressMessage(suppressMessage) {
 }
 
-RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, double pausePoint, char const* absPausePoint, MediaSession* session, MediaSubsession* subsession)
+RTSPClient::RequestRecord::RequestRecord(unsigned cseq, responseHandler* handler, size_t cmdId, Boolean suppressMessage, double pausePoint, char const* absPausePoint, MediaSession* session, MediaSubsession* subsession)
    : fNext(NULL), fCSeq(cseq), fCommandName("PAUSE"), fSession(session), fSubsession(subsession), fBooleanFlags(0),
-   fStart(0.0f), fEnd(-1.0f), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(strDup(absPausePoint)), fPausePoint(pausePoint), fScale(1.0f), fRateControl(-1), fImmediate(-1), fContentStr(NULL), fHandler(handler), fCmdId(cmdId) {
+   fStart(0.0f), fEnd(-1.0f), fAbsStartTime(NULL), fAbsEndTime(NULL), fAbsPausePoint(strDup(absPausePoint)), fPausePoint(pausePoint), fScale(1.0f), fRateControl(-1), fImmediate(-1), fContentStr(NULL), fHandler(handler), 
+   fCmdId(cmdId), fSuppressMessage(suppressMessage) {
 }
 
 RTSPClient::RequestRecord::~RequestRecord() {
