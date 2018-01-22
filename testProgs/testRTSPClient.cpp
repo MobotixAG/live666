@@ -26,9 +26,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // Forward function definitions:
 
 // RTSP 'response handlers':
-void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString);
-void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString);
-void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString);
+void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
 
 // Other event handler functions:
 void subsessionAfterPlaying(void* clientData); // called when a stream's subsession (e.g., audio or video substream) ends
@@ -187,7 +187,7 @@ void openURL(UsageEnvironment& env, char const* progName, char const* rtspURL) {
 
 // Implementation of the RTSP 'response handlers':
 
-void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterDESCRIBE(RTSPClient* rtspClient, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   do {
     UsageEnvironment& env = rtspClient->envir(); // alias
     StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
@@ -262,7 +262,7 @@ void setupNextSubsession(RTSPClient* rtspClient) {
   }
 }
 
-void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   do {
     UsageEnvironment& env = rtspClient->envir(); // alias
     StreamClientState& scs = ((ourRTSPClient*)rtspClient)->scs; // alias
@@ -307,7 +307,7 @@ void continueAfterSETUP(RTSPClient* rtspClient, int resultCode, char* resultStri
   setupNextSubsession(rtspClient);
 }
 
-void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void continueAfterPLAY(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage) {
   Boolean success = False;
 
   do {

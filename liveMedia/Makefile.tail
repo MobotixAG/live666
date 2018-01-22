@@ -62,7 +62,7 @@ $(LIVEMEDIA_LIB): $(LIVEMEDIA_LIB_OBJS) \
 		$(LIVEMEDIA_LIB_OBJS)
 
 Media.$(CPP):		include/Media.hh
-include/Media.hh:	include/liveMedia_version.hh
+include/Media.hh:	include/liveMedia_version.hh include/export.h
 MediaSource.$(CPP):	include/MediaSource.hh
 include/MediaSource.hh:		include/Media.hh
 FramedSource.$(CPP):	include/FramedSource.hh
@@ -377,11 +377,15 @@ OggFileServerMediaSubsession.hh: include/FileServerMediaSubsession.hh include/Og
 OggFileServerDemux.$(CPP): include/OggFileServerDemux.hh OggFileServerMediaSubsession.hh
 include/OggFileServerDemux.hh: include/ServerMediaSession.hh include/OggFile.hh
 BitVector.$(CPP):	include/BitVector.hh
+include/BitVector.hh:	include/export.h
 StreamParser.$(CPP):	StreamParser.hh
 DigestAuthentication.$(CPP):	include/DigestAuthentication.hh include/ourMD5.hh
+include/DigestAuthentication.hh:	include/export.h
 ourMD5.$(CPP):	include/ourMD5.hh
 Base64.$(CPP):	include/Base64.hh
+include/Base64.hh:	include/export.h
 Locale.$(CPP):	include/Locale.hh
+include/Locale.hh:	include/export.h
 
 include/liveMedia.hh:: include/MPEG1or2AudioRTPSink.hh include/MP3ADURTPSink.hh include/MPEG1or2VideoRTPSink.hh include/MPEG4ESVideoRTPSink.hh include/BasicUDPSink.hh include/AMRAudioFileSink.hh include/H264VideoFileSink.hh include/H265VideoFileSink.hh include/OggFileSink.hh include/GSMAudioRTPSink.hh include/H263plusVideoRTPSink.hh include/H264VideoRTPSink.hh include/H265VideoRTPSink.hh include/DVVideoRTPSource.hh include/DVVideoRTPSink.hh include/DVVideoStreamFramer.hh include/H264VideoStreamFramer.hh include/H265VideoStreamFramer.hh include/H264VideoStreamDiscreteFramer.hh include/H265VideoStreamDiscreteFramer.hh include/JPEGVideoRTPSink.hh include/SimpleRTPSink.hh include/uLawAudioFilter.hh include/MPEG2IndexFromTransportStream.hh include/MPEG2TransportStreamTrickModeFilter.hh include/ByteStreamMultiFileSource.hh include/ByteStreamMemoryBufferSource.hh include/BasicUDPSource.hh include/SimpleRTPSource.hh include/MPEG1or2AudioRTPSource.hh include/MPEG4LATMAudioRTPSource.hh include/MPEG4LATMAudioRTPSink.hh include/MPEG4ESVideoRTPSource.hh include/MPEG4GenericRTPSource.hh include/MP3ADURTPSource.hh include/QCELPAudioRTPSource.hh include/AMRAudioRTPSource.hh include/JPEGVideoRTPSource.hh include/JPEGVideoSource.hh include/MPEG1or2VideoRTPSource.hh include/VorbisAudioRTPSource.hh include/TheoraVideoRTPSource.hh include/VP8VideoRTPSource.hh include/VP9VideoRTPSource.hh
 

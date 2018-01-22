@@ -47,11 +47,11 @@ void setupSubsession(MediaSubsession* subsession, Boolean streamUsingTCP, Boolea
 }
 
 void startPlayingSession(MediaSession* session, double start, double end, float scale, RTSPClient::responseHandler* afterFunc) {
-  ourRTSPClient->sendPlayCommand(*session, afterFunc, start, end, scale, ourAuthenticator);
+  ourRTSPClient->sendPlayCommand(*session, afterFunc, start, end, scale, -1, -1, ourAuthenticator);
 }
 
 void startPlayingSession(MediaSession* session, char const* absStartTime, char const* absEndTime, float scale, RTSPClient::responseHandler* afterFunc) {
-  ourRTSPClient->sendPlayCommand(*session, afterFunc, absStartTime, absEndTime, scale, ourAuthenticator);
+  ourRTSPClient->sendPlayCommand(*session, afterFunc, absStartTime, absEndTime, scale, -1, -1, ourAuthenticator);
 }
 
 void tearDownSession(MediaSession* session, RTSPClient::responseHandler* afterFunc) {

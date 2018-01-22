@@ -1,4 +1,4 @@
-INCLUDES = -Iinclude -I../groupsock/include
+INCLUDES = -Iinclude -I../groupsock/include -I../liveMedia/include
 PREFIX = /usr/local
 LIBDIR = $(PREFIX)/lib
 ##### Change the following for your environment:

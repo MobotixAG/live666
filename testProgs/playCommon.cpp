@@ -35,11 +35,11 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // Forward function definitions:
 void continueAfterClientCreation0(RTSPClient* client, Boolean requestStreamingOverTCP);
 void continueAfterClientCreation1();
-void continueAfterOPTIONS(RTSPClient* client, int resultCode, char* resultString);
-void continueAfterDESCRIBE(RTSPClient* client, int resultCode, char* resultString);
-void continueAfterSETUP(RTSPClient* client, int resultCode, char* resultString);
-void continueAfterPLAY(RTSPClient* client, int resultCode, char* resultString);
-void continueAfterTEARDOWN(RTSPClient* client, int resultCode, char* resultString);
+void continueAfterOPTIONS(RTSPClient* client, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterDESCRIBE(RTSPClient* client, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterSETUP(RTSPClient* client, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterPLAY(RTSPClient* client, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
+void continueAfterTEARDOWN(RTSPClient* client, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage);
 
 void createOutputFiles(char const* periodicFilenameSuffix);
 void createPeriodicOutputFiles();
@@ -652,11 +652,11 @@ void continueAfterClientCreation1() {
     // Begin by sending an "OPTIONS" command:
     getOptions(continueAfterOPTIONS);
   } else {
-    continueAfterOPTIONS(NULL, 0, NULL);
+    continueAfterOPTIONS(NULL, 0, NULL, 0, False);
   }
 }
 
-void continueAfterOPTIONS(RTSPClient*, int resultCode, char* resultString) {
+void continueAfterOPTIONS(RTSPClient*, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   if (sendOptionsRequestOnly) {
     if (resultCode != 0) {
       *env << clientProtocolName << " \"OPTIONS\" request failed: " << resultString << "\n";
@@ -671,7 +671,7 @@ void continueAfterOPTIONS(RTSPClient*, int resultCode, char* resultString) {
   getSDPDescription(continueAfterDESCRIBE);
 }
 
-void continueAfterDESCRIBE(RTSPClient*, int resultCode, char* resultString) {
+void continueAfterDESCRIBE(RTSPClient*, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   if (resultCode != 0) {
     *env << "Failed to get a SDP description for the URL \"" << streamURL << "\": " << resultString << "\n";
     delete[] resultString;
@@ -781,7 +781,7 @@ void continueAfterDESCRIBE(RTSPClient*, int resultCode, char* resultString) {
 
 MediaSubsession *subsession;
 Boolean madeProgress = False;
-void continueAfterSETUP(RTSPClient* client, int resultCode, char* resultString) {
+void continueAfterSETUP(RTSPClient* client, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   if (resultCode == 0) {
       *env << "Setup \"" << subsession->mediumName()
 	   << "/" << subsession->codecName()
@@ -1027,7 +1027,7 @@ void setupStreams() {
   }
 }
 
-void continueAfterPLAY(RTSPClient*, int resultCode, char* resultString) {
+void continueAfterPLAY(RTSPClient*, int resultCode, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   if (resultCode != 0) {
     *env << "Failed to start playing session: " << resultString << "\n";
     delete[] resultString;
@@ -1404,10 +1404,10 @@ void shutdown(int exitCode) {
     tearDownSession(session, responseHandlerForTEARDOWN);
   }
 
-  if (shutdownImmediately) continueAfterTEARDOWN(NULL, 0, NULL);
+  if (shutdownImmediately) continueAfterTEARDOWN(NULL, 0, NULL, 0, False);
 }
 
-void continueAfterTEARDOWN(RTSPClient*, int /*resultCode*/, char* resultString) {
+void continueAfterTEARDOWN(RTSPClient*, int /*resultCode*/, char* resultString, size_t /*cmdId*/, Boolean /*suppressMessage*/) {
   delete[] resultString;
 
   // Now that we've stopped any more incoming data from arriving, close our output files:
