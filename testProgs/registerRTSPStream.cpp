@@ -28,7 +28,7 @@ Boolean requestStreamingViaTCP = False;
 char const* username = NULL;
 char const* password = NULL;
 
-void registerResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString) {
+void registerResponseHandler(RTSPClient* rtspClient, int resultCode, char* resultString, size_t cmdId, Boolean suppressMessage) {
   Medium::close(rtspClient);
 
   // We're done:

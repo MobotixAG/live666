@@ -20,7 +20,8 @@ all:
 	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
 	cd $(PROXY_SERVER_DIR) ; $(MAKE)
 	@echo
-	@echo "For more information about this source code (including your obligations under the LGPL), please see our FAQ at http://live555.com/liveMedia/faq.html"
+	@echo "For more information about this source code (including your obligations under the LGPL), please see our repository at https://github.com/MobotixAG/live666"
+	@echo "Since the live666 is forked from live555, please also visit their FAQ at http://live555.com/liveMedia/faq.html"
 
 install:
 	cd $(LIVEMEDIA_DIR) ; $(MAKE) install

@@ -57,7 +57,7 @@ void assignClient(Medium* /*client*/) {
 
 void getOptions(RTSPClient::responseHandler* afterFunc) { 
   ourSIPClient->envir().setResultMsg("NOT SUPPORTED IN CLIENT");
-  afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()));
+  afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()), 0, False);
 }
 
 void getSDPDescription(RTSPClient::responseHandler* afterFunc) {
@@ -94,7 +94,7 @@ void getSDPDescription(RTSPClient::responseHandler* afterFunc) {
   }
 
   int resultCode = result == NULL ? -1 : 0;
-  afterFunc(NULL, resultCode, strDup(result));
+  afterFunc(NULL, resultCode, strDup(result), 0, False);
 }
 
 void setupSubsession(MediaSubsession* subsession, Boolean /*streamUsingTCP*/, Boolean /*forceMulticastOnUnspecified*/,RTSPClient::responseHandler* afterFunc) {
@@ -149,7 +149,7 @@ void setupSubsession(MediaSubsession* subsession, Boolean /*streamUsingTCP*/, Bo
   }
   ////////// END hack code that should really be implemented in SIPClient //////////
 
-  afterFunc(NULL, 0, NULL);
+  afterFunc(NULL, 0, NULL, 0, False);
 }
 
 void startPlayingSession(MediaSession* /*session*/, double /*start*/, double /*end*/, float /*scale*/, RTSPClient::responseHandler* afterFunc) {
@@ -157,9 +157,9 @@ void startPlayingSession(MediaSession* /*session*/, double /*start*/, double /*e
     //##### This isn't quite right, because we should really be allowing
     //##### for the possibility of this ACK getting lost, by retransmitting
     //##### it *each time* we get a 2xx response from the server.
-    afterFunc(NULL, 0, NULL);
+    afterFunc(NULL, 0, NULL, 0, False);
   } else {
-    afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()));
+    afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()), 0, False);
   }
 }
 void startPlayingSession(MediaSession* /*session*/, const char* /*start*/, const char* /*end*/, float /*scale*/, RTSPClient::responseHandler* afterFunc) {
@@ -168,9 +168,9 @@ void startPlayingSession(MediaSession* /*session*/, const char* /*start*/, const
 
 void tearDownSession(MediaSession* /*session*/, RTSPClient::responseHandler* afterFunc) {
   if (ourSIPClient == NULL || ourSIPClient->sendBYE()) {
-    afterFunc(NULL, 0, NULL);
+    afterFunc(NULL, 0, NULL, 0, False);
   } else {
-    afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()));
+    afterFunc(NULL, -1, strDup(ourSIPClient->envir().getResultMsg()), 0, False);
   }
 }
 
