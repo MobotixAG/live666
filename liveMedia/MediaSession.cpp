@@ -60,6 +60,7 @@ MediaSession::MediaSession(UsageEnvironment& env)
   : Medium(env),
     fSubsessionsHead(NULL), fSubsessionsTail(NULL),
     fConnectionEndpointName(NULL),
+    fHasPlayStartTime(FALSE), fHasPlayEndTime(FALSE),
     fMaxPlayStartTime(0.0f), fMaxPlayEndTime(0.0f), fAbsStartTime(NULL), fAbsEndTime(NULL),
     fScale(1.0f), fSpeed(1.0f),
     fMediaSessionType(NULL), fSessionName(NULL), fSessionDescription(NULL), fControlPath(NULL) {
@@ -359,7 +360,9 @@ Boolean MediaSession::parseSDPAttribute_control(char const* sdpLine) {
 }
 
 static Boolean parseRangeAttribute(char const* sdpLine, double& startTime, double& endTime) {
-  return sscanf(sdpLine, "a=range: npt = %lg - %lg", &startTime, &endTime) == 2;
+  // returns 2 when a closed range was found
+  // returns 1 when an open range was found
+  return sscanf(sdpLine, "a=range: npt = %lg - %lg", &startTime, &endTime) >= 1;
 }
 
 static Boolean parseRangeAttribute(char const* sdpLine, char*& absStartTime, char*& absEndTime) {
@@ -386,14 +389,16 @@ Boolean MediaSession::parseSDPAttribute_range(char const* sdpLine) {
   // (Later handle other kinds of "a=range" attributes also???#####)
   Boolean parseSuccess = False;
 
-  double playStartTime;
-  double playEndTime;
+  double playStartTime (-1.0);
+  double playEndTime (-1.0);
   if (parseRangeAttribute(sdpLine, playStartTime, playEndTime)) {
     parseSuccess = True;
-    if (playStartTime > fMaxPlayStartTime) {
+    if (playStartTime >= fMaxPlayStartTime) {
+      fHasPlayStartTime = TRUE;
       fMaxPlayStartTime = playStartTime;
     }
-    if (playEndTime > fMaxPlayEndTime) {
+    if (playEndTime >= fMaxPlayEndTime) {
+      fHasPlayEndTime = TRUE;
       fMaxPlayEndTime = playEndTime;
     }
   } else if (parseRangeAttribute(sdpLine, _absStartTime(), _absEndTime())) {
