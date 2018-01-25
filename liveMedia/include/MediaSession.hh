@@ -77,6 +77,8 @@ public:
   char* sessionDescription() const { return fSessionDescription; }
   char const* controlPath() const { return fControlPath; }
 
+  bool hasPlayStartTime() { return fHasPlayStartTime; }
+  bool hasPlayEndTime() { return fHasPlayEndTime; }
   double& playStartTime() { return fMaxPlayStartTime; }
   double& playEndTime() { return fMaxPlayEndTime; }
   char* absStartTime() const;
@@ -127,6 +129,8 @@ protected:
 
   // Fields set from a SDP description:
   char* fConnectionEndpointName;
+  bool fHasPlayStartTime;
+  bool fHasPlayEndTime;
   double fMaxPlayStartTime;
   double fMaxPlayEndTime;
   char* fAbsStartTime;
