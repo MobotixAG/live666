@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2017 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2018 Live Networks, Inc.  All rights reserved.
 // A generic RTSP client
 // Implementation
 
@@ -199,14 +199,12 @@ void RTSPClient::setSpeed(MediaSession& session, float speed) {
   // Optionally set download speed for session to be used later on PLAY command:
   // The user should call this function after the MediaSession is instantiated, but before the
   // first "sendPlayCommand()" is called.
-  if (&session != NULL) {
-    session.speed() = speed;
-    MediaSubsessionIterator iter(session);
-    MediaSubsession* subsession;
+  session.speed() = speed;
+  MediaSubsessionIterator iter(session);
+  MediaSubsession* subsession;
 
-    while ((subsession = iter.next()) != NULL) {
-      subsession->speed() = speed;
-    }
+  while ((subsession = iter.next()) != NULL) {
+    subsession->speed() = speed;
   }
 }
 
@@ -1302,26 +1300,26 @@ Boolean RTSPClient::handleSETUPResponse(MediaSubsession& subsession, char const*
   return success;
 }
 
-Boolean RTSPClient::handlePLAYResponse(MediaSession& session, MediaSubsession& subsession,
+Boolean RTSPClient::handlePLAYResponse(MediaSession* session, MediaSubsession* subsession,
                                        char const* scaleParamsStr, char const* speedParamsStr,
                                        char const* rangeParamsStr, char const* rtpInfoParamsStr) {
   Boolean scaleOK = False, rangeOK = False, speedOK = False;
   do {
-    if (&session != NULL) {
+    if (session != NULL) {
       // The command was on the whole session
-      if (scaleParamsStr != NULL && !parseScaleParam(scaleParamsStr, session.scale())) break;
+      if (scaleParamsStr != NULL && !parseScaleParam(scaleParamsStr, session->scale())) break;
       scaleOK = True;
-      if (speedParamsStr != NULL && !parseSpeedParam(speedParamsStr, session.speed())) break;
+      if (speedParamsStr != NULL && !parseSpeedParam(speedParamsStr, session->speed())) break;
       speedOK = True;
       Boolean startTimeIsNow;
       if (rangeParamsStr != NULL &&
 	  !parseRangeParam(rangeParamsStr,
-			   session.playStartTime(), session.playEndTime(),
-			   session._absStartTime(), session._absEndTime(),
+               session->playStartTime(), session->playEndTime(),
+               session->_absStartTime(), session->_absEndTime(),
 			   startTimeIsNow)) break;
       rangeOK = True;
 
-      MediaSubsessionIterator iter(session);
+      MediaSubsessionIterator iter(*session);
       MediaSubsession* subsession;
       while ((subsession = iter.next()) != NULL) {
 	u_int16_t seqNum; u_int32_t timestamp;
@@ -1336,27 +1334,27 @@ Boolean RTSPClient::handlePLAYResponse(MediaSession& session, MediaSubsession& s
       }
     } else {
       // The command was on a subsession
-      if (scaleParamsStr != NULL && !parseScaleParam(scaleParamsStr, subsession.scale())) break;
+      if (scaleParamsStr != NULL && !parseScaleParam(scaleParamsStr, subsession->scale())) break;
       scaleOK = True;
-      if (speedParamsStr != NULL && !parseSpeedParam(speedParamsStr, session.speed())) break;
+      if (speedParamsStr != NULL && !parseSpeedParam(speedParamsStr, subsession->speed())) break;
       speedOK = True;
       Boolean startTimeIsNow;
       if (rangeParamsStr != NULL &&
 	  !parseRangeParam(rangeParamsStr,
-			   subsession._playStartTime(), subsession._playEndTime(),
-			   subsession._absStartTime(), subsession._absEndTime(),
+               subsession->_playStartTime(), subsession->_playEndTime(),
+               subsession->_absStartTime(), subsession->_absEndTime(),
 			   startTimeIsNow)) break;
       rangeOK = True;
 
       u_int16_t seqNum; u_int32_t timestamp;
-      subsession.rtpInfo.infoIsNew = False;
+      subsession->rtpInfo.infoIsNew = False;
       if (parseRTPInfoParams(rtpInfoParamsStr, seqNum, timestamp)) {
-	subsession.rtpInfo.seqNum = seqNum;
-	subsession.rtpInfo.timestamp = timestamp;
-	subsession.rtpInfo.infoIsNew = True;
+    subsession->rtpInfo.seqNum = seqNum;
+    subsession->rtpInfo.timestamp = timestamp;
+    subsession->rtpInfo.infoIsNew = True;
       }
 
-      if (subsession.rtpSource() != NULL) subsession.rtpSource()->enableRTCPReports() = True; // start sending RTCP "RR"s now
+      if (subsession->rtpSource() != NULL) subsession->rtpSource()->enableRTCPReports() = True; // start sending RTCP "RR"s now
     }
 
     return True;
@@ -1896,9 +1894,9 @@ void RTSPClient::handleResponseBytes(int newBytesRead) {
 	if (responseCode == 200) {
 	  // Do special-case response handling for some commands:
 	  if (strcmp(foundRequest->commandName(), "SETUP") == 0) {
-	    if (!handleSETUPResponse(*foundRequest->subsession(), sessionParamsStr, transportParamsStr, foundRequest->booleanFlags()&0x1)) break;
+        if (!handleSETUPResponse(*foundRequest->subsession(), sessionParamsStr, transportParamsStr, foundRequest->booleanFlags()&0x1)) break;
 	  } else if (strcmp(foundRequest->commandName(), "PLAY") == 0) {
-	    if (!handlePLAYResponse(*foundRequest->session(), *foundRequest->subsession(), scaleParamsStr, speedParamsStr, rangeParamsStr, rtpInfoParamsStr)) break;
+        if (!handlePLAYResponse(foundRequest->session(), foundRequest->subsession(), scaleParamsStr, speedParamsStr, rangeParamsStr, rtpInfoParamsStr)) break;
 	  } else if (strcmp(foundRequest->commandName(), "TEARDOWN") == 0) {
 	    if (!handleTEARDOWNResponse(*foundRequest->session(), *foundRequest->subsession())) break;
 	  } else if (strcmp(foundRequest->commandName(), "GET_PARAMETER") == 0) {
