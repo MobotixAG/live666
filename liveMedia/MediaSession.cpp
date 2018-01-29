@@ -60,7 +60,7 @@ MediaSession::MediaSession(UsageEnvironment& env)
   : Medium(env),
     fSubsessionsHead(NULL), fSubsessionsTail(NULL),
     fConnectionEndpointName(NULL),
-    fHasPlayStartTime(FALSE), fHasPlayEndTime(FALSE),
+    fHasPlayStartTime(False), fHasPlayEndTime(False),
     fMaxPlayStartTime(0.0f), fMaxPlayEndTime(0.0f), fAbsStartTime(NULL), fAbsEndTime(NULL),
     fScale(1.0f), fSpeed(1.0f),
     fMediaSessionType(NULL), fSessionName(NULL), fSessionDescription(NULL), fControlPath(NULL) {
@@ -394,11 +394,11 @@ Boolean MediaSession::parseSDPAttribute_range(char const* sdpLine) {
   if (parseRangeAttribute(sdpLine, playStartTime, playEndTime)) {
     parseSuccess = True;
     if (playStartTime >= fMaxPlayStartTime) {
-      fHasPlayStartTime = TRUE;
+      fHasPlayStartTime = True;
       fMaxPlayStartTime = playStartTime;
     }
     if (playEndTime >= fMaxPlayEndTime) {
-      fHasPlayEndTime = TRUE;
+      fHasPlayEndTime = True;
       fMaxPlayEndTime = playEndTime;
     }
   } else if (parseRangeAttribute(sdpLine, _absStartTime(), _absEndTime())) {
