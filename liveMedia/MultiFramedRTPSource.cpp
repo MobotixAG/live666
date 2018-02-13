@@ -342,14 +342,16 @@ void MultiFramedRTPSource::networkReadHandler1() {
     // Fill in the rest of the packet descriptor, and store it:
     struct timeval timeNow;
     gettimeofday(&timeNow, NULL);
-    bPacket->assignMiscParams(rtpSeqNo, rtpTimestamp, presentationTime,
-			      hasBeenSyncedUsingRTCP, rtpMarkerBit,
-			      timeNow);
 
     if ( sendExtHdrData )
     {
-      RTPSource::fRtpExtHdrCallback ( extHdrDefinedByProfile, extHdrDataPtr, extHdrDataSize, presentationTime, rtpSeqNo, rtpTimestamp, rtpMarkerBit, RTPSource::fRtpExtHdrCallbackPrivData );
+       RTPSource::fRtpExtHdrCallback ( extHdrDefinedByProfile, extHdrDataPtr, extHdrDataSize, presentationTime, rtpSeqNo, rtpTimestamp, rtpMarkerBit, RTPSource::fRtpExtHdrCallbackPrivData );
     }
+
+    // now store the values (could be changed in the 'fRtpExtHdrCallback')
+    bPacket->assignMiscParams(rtpSeqNo, rtpTimestamp, presentationTime,
+			      hasBeenSyncedUsingRTCP, rtpMarkerBit,
+			      timeNow);    
 
     if (!fReorderingBuffer->storePacket(bPacket)) break;
 

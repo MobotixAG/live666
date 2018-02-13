@@ -68,6 +68,7 @@ void BasicUsageEnvironment0::setResultErrMsg(MsgString msg, int err) {
 
   if (err == 0) err = getErrno();
 #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN32_WCE)
+#ifndef _UNICODE
   char errMsg[RESULT_MSG_BUFFER_MAX] = "\0";
   if (0 != FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errMsg, sizeof(errMsg)/sizeof(errMsg[0]), NULL)) {
     // Remove all trailing '\r', '\n' and '.'
@@ -77,6 +78,7 @@ void BasicUsageEnvironment0::setResultErrMsg(MsgString msg, int err) {
   } else
     snprintf(errMsg, sizeof(errMsg)/sizeof(errMsg[0]), "error %d", err);
   appendToResultMsg(errMsg);
+#endif
 #else
   appendToResultMsg(strerror(err));
 #endif
