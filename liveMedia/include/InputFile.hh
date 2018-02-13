@@ -50,6 +50,7 @@ FILE* OpenInputFile(UsageEnvironment& env, char const* fileName);
 
 void CloseInputFile(FILE* fid);
 
+#undef GetFileSize // because some platforms already define this as a macro
 u_int64_t GetFileSize(char const* fileName, FILE* fid);
     // 0 means zero-length, unbounded, or unknown
 
