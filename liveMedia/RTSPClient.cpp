@@ -705,7 +705,7 @@ static char* createRangeString(double pauseTime, char const* absPauseTime) {
       // There's no "Range:" header at all
       buf[0] = '\0';
    } else {
-      // This is the default value; we don't need a "Range:" header:
+      // Create a "Range:" header that specifies a 'relative' NPT time value:
       sprintf(buf, "Range: npt=%.3f\r\n", pauseTime);
    }    
 
