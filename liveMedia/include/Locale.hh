@@ -44,6 +44,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 #endif
 
+#ifdef __APPLE__
+#define NEED_XLOCALE_H
+#endif // #ifdef __APPLE__
+
 #ifndef LOCALE_NOT_USED
 #include <locale.h>
 #ifndef NEWLOCALE_NOT_USED
