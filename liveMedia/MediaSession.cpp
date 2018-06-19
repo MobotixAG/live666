@@ -362,7 +362,16 @@ Boolean MediaSession::parseSDPAttribute_control(char const* sdpLine) {
 static Boolean parseRangeAttribute(char const* sdpLine, double& startTime, double& endTime) {
   // returns 2 when a closed range was found
   // returns 1 when an open range was found
-  return sscanf(sdpLine, "a=range: npt = %lg - %lg", &startTime, &endTime) >= 1;
+  
+  //not matched parameters given to sscanf are undefined afterwards ! 
+  double temp = endTime;
+  int result = sscanf(sdpLine, "a=range: npt = %lg - %lg", &startTime, &endTime);
+  if ( result == 1 )
+  {
+    endTime = temp;
+    
+  }
+  return  result >= 1;
 }
 
 static Boolean parseRangeAttribute(char const* sdpLine, char*& absStartTime, char*& absEndTime) {
