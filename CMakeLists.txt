@@ -211,6 +211,8 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QCELPAudioRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeFileSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeGenericRTPSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSink.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTCP.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTPInterface.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTPSink.hh
@@ -437,6 +439,8 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/QCELPAudioRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/QuickTimeFileSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/QuickTimeGenericRTPSource.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/RawVideoRTPSink.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/RawVideoRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTCP.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/rtcp_from_spec.c
    ${${PROJECT_NAME}_HOME}/liveMedia/rtcp_from_spec.h
