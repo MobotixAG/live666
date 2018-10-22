@@ -511,6 +511,7 @@ if ( WIN32 AND NOT CMAKE_COMPILER_IS_GNUCXX )
       "/wd4312" # 'operation' : conversion from 'type1' to 'type2' of greater size
       "/wd4334" # 'operator' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
       "/wd4477" # <function> : format string <format-string> requires an argument of type <type>, but variadic argument <position> has type <type> 
+      "/wd4800" # 'type': forcing value to bool 'true' or 'false' (performance warning)
       "/wd4996" # 'function': was declared deprecated also 'std::<function name>': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.To disable this warning, use -D_SCL_SECURE_NO_WARNINGS.See documentation on how to use Visual C++ 'Checked Iterators'
    )
 else ()
