@@ -36,7 +36,7 @@ struct FrameParameters {
 };
 
 
-class RawVideoRTPSink: public VideoRTPSink {
+class LIVEMEDIA_API RawVideoRTPSink: public VideoRTPSink {
 public:
   static RawVideoRTPSink*
   createNew(UsageEnvironment& env, Groupsock* RTPgs, u_int8_t rtpPayloadFormat,
