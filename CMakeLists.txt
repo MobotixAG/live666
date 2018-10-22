@@ -5,8 +5,8 @@ set ( PROJECT_NAME live666 )
 project ( ${PROJECT_NAME} )
 
 set ( ${PROJECT_NAME}_VERSION_MAJOR "1" )
-set ( ${PROJECT_NAME}_VERSION_MINOR "19" )
-set ( ${PROJECT_NAME}_VERSION_PATCH "1" )
+set ( ${PROJECT_NAME}_VERSION_MINOR "20" )
+set ( ${PROJECT_NAME}_VERSION_PATCH "0" )
 set ( ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
 if ( CMAKE_COMPILER_IS_GNUCXX )
@@ -211,6 +211,8 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QCELPAudioRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeFileSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeGenericRTPSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSink.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTCP.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTPInterface.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTPSink.hh
@@ -437,6 +439,8 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/QCELPAudioRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/QuickTimeFileSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/QuickTimeGenericRTPSource.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/RawVideoRTPSink.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/RawVideoRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTCP.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/rtcp_from_spec.c
    ${${PROJECT_NAME}_HOME}/liveMedia/rtcp_from_spec.h
@@ -507,6 +511,7 @@ if ( WIN32 AND NOT CMAKE_COMPILER_IS_GNUCXX )
       "/wd4312" # 'operation' : conversion from 'type1' to 'type2' of greater size
       "/wd4334" # 'operator' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
       "/wd4477" # <function> : format string <format-string> requires an argument of type <type>, but variadic argument <position> has type <type> 
+      "/wd4800" # 'type': forcing value to bool 'true' or 'false' (performance warning)
       "/wd4996" # 'function': was declared deprecated also 'std::<function name>': Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.To disable this warning, use -D_SCL_SECURE_NO_WARNINGS.See documentation on how to use Visual C++ 'Checked Iterators'
    )
 else ()
