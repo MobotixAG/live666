@@ -29,7 +29,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 LIVEMEDIA_API int setupDatagramSocket(UsageEnvironment& env, Port port);
 LIVEMEDIA_API int setupStreamSocket(UsageEnvironment& env,
-		      Port port, Boolean makeNonBlocking = True);
+		      Port port, Boolean makeNonBlocking = True, Boolean setKeepAlive = False);
 
 LIVEMEDIA_API int readSocket(UsageEnvironment& env,
 	       int socket, unsigned char* buffer, unsigned bufferSize,
@@ -61,6 +61,7 @@ LIVEMEDIA_API unsigned increaseReceiveBufferTo(UsageEnvironment& env,
 LIVEMEDIA_API Boolean makeSocketNonBlocking(int sock);
 LIVEMEDIA_API Boolean makeSocketBlocking(int sock, unsigned writeTimeoutInMilliseconds = 0);
   // A "writeTimeoutInMilliseconds" value of 0 means: Don't timeout
+Boolean setSocketKeepAlive(int sock);
 
 LIVEMEDIA_API Boolean socketJoinGroup(UsageEnvironment& env, int socket,
 			netAddressBits groupAddress);
