@@ -17,6 +17,8 @@ if ( NOT DEFINED BUILD_SHARED_LIBS )
    set ( BUILD_SHARED_LIBS TRUE )
 endif ()
 
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+
 set ( ${PROJECT_NAME}_HOME ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories ( ${${PROJECT_NAME}_HOME}/UsageEnvironment/include )
 include_directories ( ${${PROJECT_NAME}_HOME}/BasicUsageEnvironment/include )
