@@ -31,10 +31,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 class H264VideoStreamDiscreteFramer: public H264or5VideoStreamDiscreteFramer {
 public:
   static H264VideoStreamDiscreteFramer*
-  createNew(UsageEnvironment& env, FramedSource* inputSource);
+  createNew(UsageEnvironment& env, FramedSource* inputSource, Boolean includeStartCodeInOutput = False);
 
 protected:
-  H264VideoStreamDiscreteFramer(UsageEnvironment& env, FramedSource* inputSource);
+  H264VideoStreamDiscreteFramer(UsageEnvironment& env, FramedSource* inputSource, Boolean includeStartCodeInOutput);
       // called only by createNew()
   virtual ~H264VideoStreamDiscreteFramer();
 
