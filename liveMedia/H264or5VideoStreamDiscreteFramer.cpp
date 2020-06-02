@@ -96,7 +96,7 @@ void H264or5VideoStreamDiscreteFramer
   fPictureEndMarker = nalUnitEndsAccessUnit(nal_unit_type);
 
   // Finally, complete delivery to the client:
-  fFrameSize = frameSize;
+  fFrameSize = fIncludeStartCodeInOutput ? (4+frameSize) : frameSize;
   fNumTruncatedBytes = numTruncatedBytes;
   fPresentationTime = presentationTime;
   fDurationInMicroseconds = durationInMicroseconds;
