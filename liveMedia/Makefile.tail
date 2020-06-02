@@ -371,9 +371,9 @@ QuickTimeGenericRTPSource.$(CPP):	include/QuickTimeGenericRTPSource.hh
 include/QuickTimeGenericRTPSource.hh:	include/MultiFramedRTPSource.hh
 AVIFileSink.$(CPP):	include/AVIFileSink.hh include/InputFile.hh include/OutputFile.hh
 include/AVIFileSink.hh:	include/MediaSession.hh
-MatroskaFile.$(CPP): MatroskaFileParser.hh MatroskaDemuxedTrack.hh include/ByteStreamFileSource.hh include/H264VideoStreamDiscreteFramer.hh include/H265VideoStreamDiscreteFramer.hh include/MPEG1or2AudioRTPSink.hh include/MPEG4GenericRTPSink.hh include/AC3AudioRTPSink.hh include/SimpleRTPSink.hh include/VorbisAudioRTPSink.hh include/H264VideoRTPSink.hh include/H265VideoRTPSink.hh include/VP8VideoRTPSink.hh include/VP9VideoRTPSink.hh include/T140TextRTPSink.hh
+MatroskaFile.$(CPP): MatroskaFileParser.hh MatroskaDemuxedTrack.hh include/ByteStreamFileSource.hh include/H264VideoStreamDiscreteFramer.hh include/H265VideoStreamDiscreteFramer.hh include/MPEG1or2AudioRTPSink.hh include/MPEG4GenericRTPSink.hh include/AC3AudioRTPSink.hh include/SimpleRTPSink.hh include/VorbisAudioRTPSink.hh include/H264VideoRTPSink.hh include/H265VideoRTPSink.hh include/VP8VideoRTPSink.hh include/VP9VideoRTPSink.hh include/T140TextRTPSink.hh include/Base64.hh include/H264VideoFileSink.hh include/H265VideoFileSink.hh include/AMRAudioFileSink.hh include/OggFileSink.hh
 MatroskaFileParser.hh:	StreamParser.hh include/MatroskaFile.hh EBMLNumber.hh
-include/MatroskaFile.hh: include/RTPSink.hh
+include/MatroskaFile.hh: include/RTPSink.hh include/FileSink.hh
 MatroskaDemuxedTrack.hh:	include/FramedSource.hh
 MatroskaFileParser.$(CPP): MatroskaFileParser.hh MatroskaDemuxedTrack.hh include/ByteStreamFileSource.hh
 EBMLNumber.$(CPP): EBMLNumber.hh

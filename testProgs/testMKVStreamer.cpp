@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 
   // Arrange to create a "MatroskaFile" object for the specified file.
   // (Note that this object is not created immediately, but instead via a callback.)
-  MatroskaFile::createNew(*env, inputFileName, onMatroskaFileCreation, NULL, "jpn");
+  MatroskaFile::createNew(*env, inputFileName, onMatroskaFileCreation, NULL);
 
   env->taskScheduler().doEventLoop(); // does not return
 
