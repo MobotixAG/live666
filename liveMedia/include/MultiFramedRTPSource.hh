@@ -53,11 +53,11 @@ protected:
 
 protected:
   // redefined virtual functions:
+  virtual void doGetNextFrame();
   virtual void doStopGettingFrames();
 
 private:
   // redefined virtual functions:
-  virtual void doGetNextFrame();
   virtual void setPacketReorderingThresholdTime(unsigned uSeconds);
 
 private:

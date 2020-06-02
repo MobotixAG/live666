@@ -714,6 +714,7 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 #ifdef DEBUG
       fprintf(stderr, "parseRTSPRequestString() returned a bogus \"Content-Length:\" value: 0x%x (%d)\n", contentLength, (int)contentLength);
 #endif
+      contentLength = 0;
       parseSucceeded = False;
     }
     if (parseSucceeded) {
