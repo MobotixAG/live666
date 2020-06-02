@@ -78,7 +78,7 @@ OggFileSink::~OggFileSink() {
   OggFileSink::addData(fAltBuffer, fAltFrameSize, fAltPresentationTime);
 
   delete[] fAltBuffer;
-  delete[] fConfigStr;
+  delete[] (char*)fConfigStr;
 }
 
 Boolean OggFileSink::continuePlaying() {

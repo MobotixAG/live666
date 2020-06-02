@@ -20,6 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #include "MPEG2TransportStreamParser.hh"
 #include "FileSink.hh"
+#include <time.h> // for time_t
 
 Boolean MPEG2TransportStreamParser
 ::processStreamPacket(PIDState_STREAM* pidState, Boolean pusi, unsigned numDataBytes) {

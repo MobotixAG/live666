@@ -132,5 +132,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "OggFileServerDemux.hh"
 #include "MPEG2TransportStreamDemux.hh"
 #include "ProxyServerMediaSession.hh"
+#include "HLSSegmenter.hh"
 
 #endif

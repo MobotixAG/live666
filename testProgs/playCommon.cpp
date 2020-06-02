@@ -1125,7 +1125,7 @@ void subsessionByeHandler(void* clientData, char const* reason) {
   *env << "Received RTCP \"BYE\"";
   if (reason != NULL) {
     *env << " (reason:\"" << reason << "\")";
-    delete[] reason;
+    delete[] (char*)reason;
   }
   *env << " on \"" << subsession->mediumName()
 	<< "/" << subsession->codecName()

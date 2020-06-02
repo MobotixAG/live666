@@ -377,7 +377,7 @@ void subsessionByeHandler(void* clientData, char const* reason) {
   env << *rtspClient << "Received RTCP \"BYE\"";
   if (reason != NULL) {
     env << " (reason:\"" << reason << "\")";
-    delete[] reason;
+    delete[] (char*)reason;
   }
   env << " on \"" << *subsession << "\" subsession\n";
 

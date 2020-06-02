@@ -37,7 +37,7 @@ H264or5VideoFileSink
 }
 
 H264or5VideoFileSink::~H264or5VideoFileSink() {
-  for (unsigned j = 0; j < 3; ++j) delete[] fSPropParameterSetsStr[j];
+  for (unsigned j = 0; j < 3; ++j) delete[] (char*)fSPropParameterSetsStr[j];
 }
 
 void H264or5VideoFileSink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes, struct timeval presentationTime) {

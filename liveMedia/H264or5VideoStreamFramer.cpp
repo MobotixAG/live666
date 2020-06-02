@@ -74,9 +74,11 @@ private:
 
 H264or5VideoStreamFramer
 ::H264or5VideoStreamFramer(int hNumber, UsageEnvironment& env, FramedSource* inputSource,
-			   Boolean createParser, Boolean includeStartCodeInOutput)
+			   Boolean createParser,
+			   Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters)
   : MPEGVideoStreamFramer(env, inputSource),
-    fHNumber(hNumber),
+    fHNumber(hNumber), fIncludeStartCodeInOutput(includeStartCodeInOutput),
+    fInsertAccessUnitDelimiters(insertAccessUnitDelimiters),
     fLastSeenVPS(NULL), fLastSeenVPSSize(0),
     fLastSeenSPS(NULL), fLastSeenSPSSize(0),
     fLastSeenPPS(NULL), fLastSeenPPSSize(0) {
@@ -141,6 +143,40 @@ Boolean H264or5VideoStreamFramer::isVCL(u_int8_t nal_unit_type) {
   return fHNumber == 264
     ? (nal_unit_type <= 5 && nal_unit_type > 0)
     : (nal_unit_type <= 31);
+}
+
+void H264or5VideoStreamFramer::doGetNextFrame() {
+  if (fInsertAccessUnitDelimiters && pictureEndMarker()) {
+    // Deliver an "access_unit_delimiter" NAL unit instead:
+    unsigned const startCodeSize = fIncludeStartCodeInOutput ? 4: 0;
+    unsigned const audNALSize = fHNumber == 264 ? 2 : 3;
+
+    fFrameSize = startCodeSize + audNALSize;
+    if (fFrameSize > fMaxSize) { // there's no space
+      fNumTruncatedBytes = fFrameSize - fMaxSize;
+      fFrameSize = fMaxSize;
+      handleClosure();
+      return;
+    }
+
+    if (fIncludeStartCodeInOutput) {
+      *fTo++ = 0x00; *fTo++ = 0x00; *fTo++ = 0x00; *fTo++ = 0x01;
+    }
+    if (fHNumber == 264) {
+      *fTo++ = 9; // "Access unit delimiter" nal_unit_type
+      *fTo++ = 0xF0; // "primary_pic_type" (7); "rbsp_trailing_bits()"
+    } else { // H.265
+      *fTo++ = 35<<1; // "Access unit delimiter" nal_unit_type
+      *fTo++ = 0; // "nuh_layer_id" (0); "nuh_temporal_id_plus1" (0) (Is this correct??)
+      *fTo++ = 0x50; // "pic_type" (2); "rbsp_trailing_bits()" (Is this correct??)
+    }
+
+    pictureEndMarker() = False; // for next time
+    afterGetting(this);
+  } else {
+    // Do the normal delivery of a NAL unit from the parser:
+    MPEGVideoStreamFramer::doGetNextFrame();
+  }
 }
 
 

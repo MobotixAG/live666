@@ -104,7 +104,7 @@ public:
 
 private:
   // Parsing functions:
-  friend MPEG2TransportStreamDemuxedTrack;
+  friend class MPEG2TransportStreamDemuxedTrack;
   Boolean parse(); // returns True iff we have finished parsing all BOS pages (on initialization)
 
   u_int8_t parseAdaptationField();

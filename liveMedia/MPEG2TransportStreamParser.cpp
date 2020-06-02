@@ -103,9 +103,6 @@ Boolean MPEG2TransportStreamParser::parse() {
   try {
     while (1) {
       // Make sure we start with a 'sync byte':
-#ifdef DEBUG_ERRORS
-      if (test1Byte() != TRANSPORT_SYNC_BYTE) fprintf(stderr, "Skipping to next sync byte!\n");
-#endif
       do {
 	saveParserState();
       } while (get1Byte() != TRANSPORT_SYNC_BYTE);
@@ -183,6 +180,9 @@ u_int8_t MPEG2TransportStreamParser::parseAdaptationField() {
 #endif
   if (adaptation_field_length > 0) {
     u_int8_t flags = get1Byte();
+#ifdef DEBUG_CONTENTS
+    fprintf(stderr, "\t\tadaptation field flags: 0x%02x\n", flags);
+#endif
     if ((flags&0x10) != 0) { // PCR_flag
       u_int32_t first32PCRBits = get4Bytes();
       u_int16_t last16PCRBits = get2Bytes();
@@ -297,6 +297,9 @@ Boolean MPEG2TransportStreamParser
     }
     case STREAM: {
       return processStreamPacket((PIDState_STREAM*)pidState, pusi, numDataBytes);
+    }
+    default: { // Never reached, but eliminates a possible error with dumb compilers
+      return False;
     }
   }  
 }
