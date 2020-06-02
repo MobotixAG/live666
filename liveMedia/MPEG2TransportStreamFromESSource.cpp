@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2019 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2020 Live Networks, Inc.  All rights reserved.
 // A filter for converting one or more MPEG Elementary Streams
 // to a MPEG-2 Transport Stream
 // Implementation
@@ -220,7 +220,7 @@ Boolean InputESSourceRecord::deliverBufferToClient() {
 
   // Do the delivery:
   fParent.handleNewBuffer(fInputBuffer, fInputBufferBytesAvailable,
-			 fMPEGVersion, fSCR, fPID);
+			  fMPEGVersion, fSCR, fPID);
 
   return True;
 }
