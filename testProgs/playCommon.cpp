@@ -906,6 +906,13 @@ void createOutputFiles(char const* periodicFilenameSuffix) {
 	} else if (strcmp(subsession->codecName(), "VORBIS") == 0 ||
 		   strcmp(subsession->codecName(), "OPUS") == 0) {
 	  createOggFileSink = True;
+	} else if (strcmp(subsession->codecName(), "MPEG4-GENERIC") == 0) {
+	  // For AAC audio, we use a regular file sink, but add a 'ADTS framer' filter
+	  // to the end of the data source, so that the resulting file is playable:
+	  FramedFilter* adtsFramer
+	    = ADTSAudioStreamDiscreteFramer::createNew(*env, subsession->readSource(),
+						       subsession->fmtp_config());
+	  subsession->addFilter(adtsFramer);
 	}
       }
       if (createOggFileSink) {
