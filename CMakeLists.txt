@@ -95,6 +95,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/AC3AudioStreamFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/ADTSAudioFileServerMediaSubsession.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/ADTSAudioFileSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/ADTSAudioStreamDiscreteFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/AMRAudioFileServerMediaSubsession.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/AMRAudioFileSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/AMRAudioFileSource.hh
@@ -146,7 +147,12 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/H265VideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/H265VideoStreamDiscreteFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/H265VideoStreamFramer.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/HLSSegmenter.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/HMAC_hash.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/HMAC_SHA1.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/InputFile.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/JPEG2000VideoRTPSink.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/JPEG2000VideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/JPEGVideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/JPEGVideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/JPEGVideoSource.hh
@@ -160,6 +166,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MediaSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MediaSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MediaTranscodingTable.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/MIKEY.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MP3ADU.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MP3ADUinterleaving.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MP3ADURTPSink.hh
@@ -183,6 +190,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2IndexFromTransportStream.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportFileServerMediaSubsession.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamAccumulator.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamDemux.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFramer.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFromESSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/MPEG2TransportStreamFromPESSource.hh
@@ -227,11 +235,13 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SimpleRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SimpleRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SIPClient.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/SRTPCryptographicContext.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/StreamReplicator.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/T140TextRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TextRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TheoraVideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TheoraVideoRTPSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/TLSState.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/uLawAudioFilter.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/VideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/VorbisAudioRTPSink.hh
@@ -296,6 +306,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/AC3AudioStreamFramer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/ADTSAudioFileServerMediaSubsession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/ADTSAudioFileSource.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/ADTSAudioStreamDiscreteFramer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/AMRAudioFileServerMediaSubsession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/AMRAudioFileSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/AMRAudioFileSource.cpp
@@ -350,7 +361,11 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/H265VideoRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/H265VideoStreamDiscreteFramer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/H265VideoStreamFramer.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/HLSSegmenter.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/HMAC_SHA1.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/InputFile.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/JPEG2000VideoRTPSink.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/JPEG2000VideoRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/JPEGVideoRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/JPEGVideoRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/JPEGVideoSource.cpp
@@ -367,6 +382,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/MediaSession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MediaSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MediaSource.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MIKEY.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MP3ADU.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MP3ADUdescriptor.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MP3ADUdescriptor.hh
@@ -402,10 +418,18 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportFileServerMediaSubsession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamAccumulator.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFramer.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamDemux.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamDemuxedTrack.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamDemuxedTrack.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFromESSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamFromPESSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamIndexFile.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamMultiplexor.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamParser.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamParser.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamParser_PAT.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamParser_PMT.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamParser_STREAM.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportStreamTrickModeFilter.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG2TransportUDPServerMediaSubsession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/MPEG4ESVideoRTPSink.cpp
@@ -456,6 +480,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/SimpleRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/SimpleRTPSource.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/SIPClient.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/SRTPCryptographicContext.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/StreamParser.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/StreamParser.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/StreamReplicator.cpp
@@ -463,6 +488,7 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/TextRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/TheoraVideoRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/TheoraVideoRTPSource.cpp
+   ${${PROJECT_NAME}_HOME}/liveMedia/TLSState.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/uLawAudioFilter.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/VideoRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/VorbisAudioRTPSink.cpp
