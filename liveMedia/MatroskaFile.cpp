@@ -334,6 +334,7 @@ void MatroskaFile::getH265ConfigData(MatroskaTrack const* track,
  	VPS_SPS_PPSBytes = &track->codecPrivate[22];
       }
     }
+    if (VPS_SPS_PPSBytes == NULL) break; // no VPS,SPS,PPS NAL unit information was present
 	
     // Extract, from "VPS_SPS_PPSBytes", one VPS NAL unit, one SPS NAL unit, and one PPS NAL unit.
     // (I hope one is all we need of each.)

@@ -142,12 +142,11 @@ unsigned RTSPClient::sendGetParameterCommand(MediaSession& session, responseHand
   if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
 
   // We assume that:
-  //    parameterName is NULL means: Send no body in the request.
-  //    parameterName is "" means: Send only \r\n in the request body.  
+  //    parameterName is NULL or "" means: Send no body in the request.
   //    parameterName is non-empty means: Send "<parameterName>\r\n" as the request body.  
   unsigned parameterNameLen = parameterName == NULL ? 0 : strlen(parameterName);
   char* paramString = new char[parameterNameLen + 3]; // the 3 is for \r\n + the '\0' byte
-  if (parameterName == NULL) {
+  if (parameterName == NULL || parameterName[0] == '\0') {
     paramString[0] = '\0';
   } else {
     sprintf(paramString, "%s\r\n", parameterName);

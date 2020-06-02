@@ -55,7 +55,7 @@ void GenericMediaServer::removeServerMediaSession(ServerMediaSession* serverMedi
 }
 
 void GenericMediaServer::removeServerMediaSession(char const* streamName) {
-  removeServerMediaSession(lookupServerMediaSession(streamName));
+  removeServerMediaSession(GenericMediaServer::lookupServerMediaSession(streamName));
 }
 
 void GenericMediaServer::closeAllClientSessionsForServerMediaSession(ServerMediaSession* serverMediaSession) {
