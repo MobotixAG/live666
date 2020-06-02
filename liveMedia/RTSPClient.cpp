@@ -40,7 +40,7 @@ unsigned RTSPClient::sendDescribeCommand(responseHandler* responseHandler, Authe
 }
 
 unsigned RTSPClient::sendOptionsCommand(responseHandler* responseHandler, Authenticator* authenticator) {
-  if (authenticator != NULL) fCurrentAuthenticator = *authenticator;
+  if (fCurrentAuthenticator < authenticator) fCurrentAuthenticator = *authenticator;
   return sendRequest(new RequestRecord(++fCSeq, "OPTIONS", responseHandler));
 }
 
