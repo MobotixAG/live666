@@ -37,7 +37,7 @@ RTP_OBJS = $(RTP_SOURCE_OBJS) $(RTP_SINK_OBJS) $(RTP_INTERFACE_OBJS)
 
 RTCP_OBJS = RTCP.$(OBJ) rtcp_from_spec.$(OBJ)
 GENERIC_MEDIA_SERVER_OBJS = GenericMediaServer.$(OBJ)
-RTSP_OBJS = RTSPServer.$(OBJ) RTSPServerRegister.$(OBJ) RTSPClient.$(OBJ) RTSPCommon.$(OBJ) RTSPServerSupportingHTTPStreaming.$(OBJ) RTSPRegisterSender.$(OBJ) TLSState.$(OBJ)
+RTSP_OBJS = RTSPServer.$(OBJ) RTSPServerRegister.$(OBJ) RTSPClient.$(OBJ) RTSPCommon.$(OBJ) RTSPServerSupportingHTTPStreaming.$(OBJ) RTSPRegisterSender.$(OBJ)
 SIP_OBJS = SIPClient.$(OBJ)
 
 SESSION_OBJS = MediaSession.$(OBJ) ServerMediaSession.$(OBJ) PassiveServerMediaSubsession.$(OBJ) OnDemandServerMediaSubsession.$(OBJ) FileServerMediaSubsession.$(OBJ) MPEG4VideoFileServerMediaSubsession.$(OBJ) H264VideoFileServerMediaSubsession.$(OBJ) H265VideoFileServerMediaSubsession.$(OBJ) H263plusVideoFileServerMediaSubsession.$(OBJ) WAVAudioFileServerMediaSubsession.$(OBJ) AMRAudioFileServerMediaSubsession.$(OBJ) MP3AudioFileServerMediaSubsession.$(OBJ) MPEG1or2VideoFileServerMediaSubsession.$(OBJ) MPEG1or2FileServerDemux.$(OBJ) MPEG1or2DemuxedServerMediaSubsession.$(OBJ) MPEG2TransportFileServerMediaSubsession.$(OBJ) ADTSAudioFileServerMediaSubsession.$(OBJ) DVVideoFileServerMediaSubsession.$(OBJ) AC3AudioFileServerMediaSubsession.$(OBJ) MPEG2TransportUDPServerMediaSubsession.$(OBJ) ProxyServerMediaSession.$(OBJ)
@@ -59,9 +59,11 @@ TRANSPORT_STREAM_DEMUX_OBJS = MPEG2TransportStreamDemux.$(OBJ) MPEG2TransportStr
 
 HLS_OBJS = HLSSegmenter.$(OBJ)
 
+SECURITY_OBJS = TLSState.$(OBJ) MIKEY.$(OBJ) SRTPCryptographicContext.$(OBJ) HMAC_SHA1.$(OBJ)
+
 MISC_OBJS = BitVector.$(OBJ) StreamParser.$(OBJ) DigestAuthentication.$(OBJ) ourMD5.$(OBJ) Base64.$(OBJ) Locale.$(OBJ)
 
-LIVEMEDIA_LIB_OBJS = Media.$(OBJ) $(MISC_SOURCE_OBJS) $(MISC_SINK_OBJS) $(MISC_FILTER_OBJS) $(RTP_OBJS) $(RTCP_OBJS) $(GENERIC_MEDIA_SERVER_OBJS) $(RTSP_OBJS) $(SIP_OBJS) $(SESSION_OBJS) $(QUICKTIME_OBJS) $(AVI_OBJS) $(TRANSPORT_STREAM_TRICK_PLAY_OBJS) $(MATROSKA_OBJS) $(OGG_OBJS) $(TRANSPORT_STREAM_DEMUX_OBJS) $(HLS_OBJS) $(MISC_OBJS)
+LIVEMEDIA_LIB_OBJS = Media.$(OBJ) $(MISC_SOURCE_OBJS) $(MISC_SINK_OBJS) $(MISC_FILTER_OBJS) $(RTP_OBJS) $(RTCP_OBJS) $(GENERIC_MEDIA_SERVER_OBJS) $(RTSP_OBJS) $(SIP_OBJS) $(SESSION_OBJS) $(QUICKTIME_OBJS) $(AVI_OBJS) $(TRANSPORT_STREAM_TRICK_PLAY_OBJS) $(MATROSKA_OBJS) $(OGG_OBJS) $(TRANSPORT_STREAM_DEMUX_OBJS) $(HLS_OBJS) $(SECURITY_OBJS) $(MISC_OBJS)
 
 $(LIVEMEDIA_LIB): $(LIVEMEDIA_LIB_OBJS) \
     $(PLATFORM_SPECIFIC_LIB_OBJS)
@@ -79,7 +81,7 @@ include/FramedFileSource.hh:	include/FramedSource.hh
 FramedFilter.$(CPP):	include/FramedFilter.hh
 include/FramedFilter.hh:	include/FramedSource.hh
 RTPSource.$(CPP):	include/RTPSource.hh
-include/RTPSource.hh:		include/FramedSource.hh include/RTPInterface.hh
+include/RTPSource.hh:		include/FramedSource.hh include/RTPInterface.hh include/SRTPCryptographicContext.hh
 include/RTPInterface.hh:	include/Media.hh
 MultiFramedRTPSource.$(CPP):	include/MultiFramedRTPSource.hh include/RTCP.hh
 include/MultiFramedRTPSource.hh:	include/RTPSource.hh
@@ -307,7 +309,7 @@ include/MPEG2TransportStreamIndexFile.hh:	include/Media.hh
 MPEG2TransportStreamTrickModeFilter.$(CPP):	include/MPEG2TransportStreamTrickModeFilter.hh include/ByteStreamFileSource.hh
 include/MPEG2TransportStreamTrickModeFilter.hh:	include/FramedFilter.hh include/MPEG2TransportStreamIndexFile.hh
 RTCP.$(CPP):		include/RTCP.hh rtcp_from_spec.h
-include/RTCP.hh:		include/RTPSink.hh include/RTPSource.hh
+include/RTCP.hh:		include/RTPSink.hh include/RTPSource.hh include/SRTPCryptographicContext.hh
 rtcp_from_spec.$(C):	rtcp_from_spec.h
 GenericMediaServer.$(CPP):	include/GenericMediaServer.hh
 include/GenericMediaServer.hh:	include/ServerMediaSession.hh
@@ -322,11 +324,10 @@ RTSPServerSupportingHTTPStreaming.$(CPP):	include/RTSPServerSupportingHTTPStream
 include/RTSPServerSupportingHTTPStreaming.hh:	include/RTSPServer.hh include/ByteStreamMemoryBufferSource.hh include/TCPStreamSink.hh
 RTSPRegisterSender.$(CPP):	include/RTSPRegisterSender.hh
 include/RTSPRegisterSender.hh:	include/RTSPClient.hh
-TLSState.$(CPP):		include/TLSState.hh include/RTSPClient.hh
 SIPClient.$(CPP):	include/SIPClient.hh
 include/SIPClient.hh:		include/MediaSession.hh include/DigestAuthentication.hh
-MediaSession.$(CPP):	include/liveMedia.hh include/Locale.hh
-include/MediaSession.hh:	include/RTCP.hh include/FramedFilter.hh
+MediaSession.$(CPP):	include/liveMedia.hh include/Locale.hh include/Base64.hh
+include/MediaSession.hh:	include/RTCP.hh include/FramedFilter.hh include/SRTPCryptographicContext.hh
 ServerMediaSession.$(CPP):	include/ServerMediaSession.hh
 PassiveServerMediaSubsession.$(CPP):	include/PassiveServerMediaSubsession.hh
 include/PassiveServerMediaSubsession.hh:	include/ServerMediaSession.hh include/RTPSink.hh include/RTCP.hh
@@ -409,6 +410,12 @@ MPEG2TransportStreamParser_PMT.$(CPP): MPEG2TransportStreamParser.hh
 MPEG2TransportStreamParser_STREAM.$(CPP): MPEG2TransportStreamParser.hh include/FileSink.hh
 HLSSegmenter.$(CPP): include/HLSSegmenter.hh include/OutputFile.hh include/MPEG2TransportStreamMultiplexor.hh
 include/HLSSegmenter.hh: include/MediaSink.hh
+TLSState.$(CPP):		include/TLSState.hh include/RTSPClient.hh
+MIKEY.$(CPP):		 include/MIKEY.hh
+HMAC_SHA1.$(CPP):	include/HMAC_SHA1.hh
+include/SRTPCryptographicContext.hh:	include/MIKEY.hh
+SRTPCryptographicContext.$(CPP):	include/SRTPCryptographicContext.hh include/HMAC_SHA1.hh
+include/HMAC_SHA1.hh:	include/HMAC_hash.hh
 BitVector.$(CPP):	include/BitVector.hh
 StreamParser.$(CPP):	StreamParser.hh
 DigestAuthentication.$(CPP):	include/DigestAuthentication.hh include/ourMD5.hh

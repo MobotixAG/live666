@@ -40,7 +40,7 @@ public:
   Boolean isNeeded;
 
   int connect(int socketNum); // returns: -1 (unrecoverable error), 0 (pending), 1 (done)
-  int write(const u_int8_t* data, unsigned count);
+  int write(const char* data, unsigned count);
   int read(u_int8_t* buffer, unsigned bufferSize);
 
 private:

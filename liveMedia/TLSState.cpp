@@ -24,7 +24,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 TLSState::TLSState(RTSPClient& client)
   : isNeeded(False)
 #ifndef NO_OPENSSL
-  , fClient(client), fHasBeenSetup(False)
+  , fClient(client), fHasBeenSetup(False), fCtx(NULL), fCon(NULL)
 #endif
 {
 }
@@ -62,7 +62,7 @@ int TLSState::connect(int socketNum) {
 #endif
 }
 
-int TLSState::write(const u_int8_t* data, unsigned count) {
+int TLSState::write(const char* data, unsigned count) {
 #ifndef NO_OPENSSL
   return SSL_write(fCon, data, count);
 #else
@@ -72,7 +72,12 @@ int TLSState::write(const u_int8_t* data, unsigned count) {
 
 int TLSState::read(u_int8_t* buffer, unsigned bufferSize) {
 #ifndef NO_OPENSSL
-  return SSL_read(fCon, buffer, bufferSize);
+  int result = SSL_read(fCon, buffer, bufferSize);
+  if (result < 0 && SSL_get_error(fCon, result) == SSL_ERROR_WANT_READ) {
+    // The data can't be delivered yet.  Return 0 (bytes read); we'll try again later
+    return 0;
+  }
+  return result;
 #else
   return 0;
 #endif

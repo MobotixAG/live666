@@ -100,7 +100,6 @@ void WindowsAudioInputDevice_common::audioReadyPoller(void* clientData) {
 }
 
 void WindowsAudioInputDevice_common::audioReadyPoller1() {
-  nextTask() = NULL;
   if (readHead != NULL) {
     onceAudioIsReady();
   } else {

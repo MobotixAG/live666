@@ -65,6 +65,7 @@ private:
 
   void scheduleDESCRIBECommand();
   static void sendDESCRIBE(void* clientData);
+  void sendDESCRIBE();
 
   static void subsessionTimeout(void* clientData);
   void handleSubsessionTimeout();

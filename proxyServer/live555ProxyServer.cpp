@@ -159,11 +159,11 @@ int main(int argc, char** argv) {
 
     ++argv; --argc;
   }
-  if (argc < 2 && !proxyREGISTERRequests) usage(); // there must be at least one "rtsp://" URL at the end 
-  // Make sure that the remaining arguments appear to be "rtsp://" URLs:
+  if (argc < 2 && !proxyREGISTERRequests) usage(); // there must be at least one URL at the end 
+  // Make sure that the remaining arguments appear to be "rtsp://" (or "rtsps://") URLs:
   int i;
   for (i = 1; i < argc; ++i) {
-    if (strncmp(argv[i], "rtsp://", 7) != 0) usage();
+    if (strncmp(argv[i], "rtsp://", 7) != 0 && strncmp(argv[i], "rtsps://", 8) != 0) usage();
   }
   // Do some additional checking for invalid command-line argument combinations:
   if (authDBForREGISTER != NULL && !proxyREGISTERRequests) {

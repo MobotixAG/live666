@@ -48,11 +48,11 @@ ServerMediaSession* DynamicRTSPServer
 ::lookupServerMediaSession(char const* streamName, Boolean isFirstLookupInSession) {
   // First, check whether the specified "streamName" exists as a local file:
   FILE* fid = fopen(streamName, "rb");
-  Boolean fileExists = fid != NULL;
+  Boolean const fileExists = fid != NULL;
 
   // Next, check whether we already have a "ServerMediaSession" for this file:
   ServerMediaSession* sms = RTSPServer::lookupServerMediaSession(streamName);
-  Boolean smsExists = sms != NULL;
+  Boolean const smsExists = sms != NULL;
 
   // Handle the four possibilities for "fileExists" and "smsExists":
   if (!fileExists) {

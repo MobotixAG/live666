@@ -1163,6 +1163,7 @@ void sessionTimerHandler(void* /*clientData*/) {
 }
 
 void periodicFileOutputTimerHandler(void* /*clientData*/) {
+  periodicFileOutputTask = NULL;
   fileOutputSecondsSoFar += fileOutputInterval;
 
   // First, close the existing output files:
@@ -1435,6 +1436,7 @@ void signalHandlerShutdown(int /*sig*/) {
 }
 
 void checkForPacketArrival(void* /*clientData*/) {
+  arrivalCheckTimerTask = NULL;
   if (!notifyOnPacketArrival) return; // we're not checking
 
   // Check each subsession, to see whether it has received data packets:
@@ -1493,6 +1495,7 @@ void checkForPacketArrival(void* /*clientData*/) {
 }
 
 void checkInterPacketGaps(void* /*clientData*/) {
+  interPacketGapCheckTimerTask = NULL;
   if (interPacketGapMaxTime == 0) return; // we're not checking
 
   // Check each subsession, counting up how many packets have been received:
