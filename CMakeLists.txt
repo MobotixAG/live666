@@ -223,14 +223,12 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTSPCommon.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTSPRegisterSender.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTSPServer.hh
-   ${${PROJECT_NAME}_HOME}/liveMedia/include/RTSPServerSupportingHTTPStreaming.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/ServerMediaSession.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SimpleRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SimpleRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/SIPClient.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/StreamReplicator.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/T140TextRTPSink.hh
-   ${${PROJECT_NAME}_HOME}/liveMedia/include/TCPStreamSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TextRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TheoraVideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/TheoraVideoRTPSource.hh
@@ -454,7 +452,6 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPRegisterSender.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServer.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServerRegister.cpp
-   ${${PROJECT_NAME}_HOME}/liveMedia/RTSPServerSupportingHTTPStreaming.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/ServerMediaSession.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/SimpleRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/SimpleRTPSource.cpp
@@ -463,7 +460,6 @@ list ( APPEND ${PROJECT_NAME}_SOURCES_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/StreamParser.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/StreamReplicator.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/T140TextRTPSink.cpp
-   ${${PROJECT_NAME}_HOME}/liveMedia/TCPStreamSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/TextRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/TheoraVideoRTPSink.cpp
    ${${PROJECT_NAME}_HOME}/liveMedia/TheoraVideoRTPSource.cpp
