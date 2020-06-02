@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
   }
   // Do some additional checking for invalid command-line argument combinations:
   if (authDBForREGISTER != NULL && !proxyREGISTERRequests) {
-    *env << "The '-U <username> <password>' option can be used only with -R\n";
+    *env << "The '-U <username-for-REGISTER> <password-for-REGISTER>' option can be used only with -R\n";
     usage();
   }
   if (streamRTPOverTCP) {

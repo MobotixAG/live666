@@ -613,6 +613,7 @@ int main(int argc, char** argv) {
 						   verbosityLevel, progName);
     if (handlerServerForREGISTERCommand == NULL) {
       *env << "Failed to create a server for handling incoming \"REGISTER\" commands: " << env->getResultMsg() << "\n";
+      shutdown();
     } else {
       *env << "Awaiting an incoming \"REGISTER\" command on port " << handlerServerForREGISTERCommand->serverPortNum() << "\n";
     }

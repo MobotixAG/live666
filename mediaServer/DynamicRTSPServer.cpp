@@ -35,7 +35,7 @@ DynamicRTSPServer::createNew(UsageEnvironment& env, Port ourPort,
 DynamicRTSPServer::DynamicRTSPServer(UsageEnvironment& env, int ourSocket,
 				     Port ourPort,
 				     UserAuthenticationDatabase* authDatabase, unsigned reclamationTestSeconds)
-  : RTSPServerSupportingHTTPStreaming(env, ourSocket, ourPort, authDatabase, reclamationTestSeconds) {
+  : RTSPServer(env, ourSocket, ourPort, authDatabase, reclamationTestSeconds) {
 }
 
 DynamicRTSPServer::~DynamicRTSPServer() {

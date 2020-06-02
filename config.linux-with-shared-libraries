@@ -3,7 +3,7 @@
 # At least one interface changes, or is removed => CURRENT += 1; REVISION = 0; AGE = 0
 # One or more interfaces were added, but no existing interfaces were changed or removed => CURRENT += 1; REVISION = 0; AGE += 1
 
-libliveMedia_VERSION_CURRENT=78
+libliveMedia_VERSION_CURRENT=79
 libliveMedia_VERSION_REVISION=0
 libliveMedia_VERSION_AGE=0
 libliveMedia_LIB_SUFFIX=so.$(shell expr $(libliveMedia_VERSION_CURRENT) - $(libliveMedia_VERSION_AGE)).$(libliveMedia_VERSION_AGE).$(libliveMedia_VERSION_REVISION)
@@ -41,5 +41,6 @@ LIB_SUFFIX =	 	$(SHORT_LIB_SUFFIX).$($(NAME)_VERSION_AGE).$($(NAME)_VERSION_REVI
 LIBRARY_LINK_OPTS =	-shared -Wl,-soname,$(NAME).$(SHORT_LIB_SUFFIX) $(LDFLAGS)
 LIBS_FOR_CONSOLE_APPLICATION = -lssl -lcrypto
 LIBS_FOR_GUI_APPLICATION =
+LIBS_FOR_LIVEMEDIA_LIB = -lssl -lcrypto
 EXE =
 INSTALL2 =		install_shared_libraries
