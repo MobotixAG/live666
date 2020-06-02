@@ -92,7 +92,6 @@ void MatroskaFileParser
 
 void MatroskaFileParser::continueParsing() {
   if (fInputSource != NULL) {
-
     if (!parse()) {
       // We didn't complete the parsing, because we had to read more data from the source, or because we're waiting for
       // another read from downstream.  Once that happens, we'll get called again.

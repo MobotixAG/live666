@@ -130,6 +130,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "MPEG2TransportUDPServerMediaSubsession.hh"
 #include "MatroskaFileServerDemux.hh"
 #include "OggFileServerDemux.hh"
+#include "MPEG2TransportStreamDemux.hh"
 #include "ProxyServerMediaSession.hh"
 
 #endif
