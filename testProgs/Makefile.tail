@@ -13,7 +13,6 @@ HLS_APPS = testH264VideoToHLSSegments$(EXE)
 
 MISC_APPS = testMPEG1or2Splitter$(EXE) testMPEG1or2ProgramToTransportStream$(EXE) testH264VideoToTransportStream$(EXE) testH265VideoToTransportStream$(EXE) MPEG2TransportStreamIndexer$(EXE) testMPEG2TransportStreamTrickPlay$(EXE) registerRTSPStream$(EXE) testMKVSplitter$(EXE) testMPEG2TransportStreamSplitter$(EXE) mikeyParse$(EXE)
 
-PREFIX = /usr/local
 ALL = $(MULTICAST_APPS) $(UNICAST_APPS) $(HLS_APPS) $(MISC_APPS)
 all: $(ALL)
 

@@ -25,6 +25,7 @@ static void sha1(u_int8_t* resultDigest/*must be SHA1_DIGEST_LEN bytes in size*/
     EVP_DigestUpdate(ctx, data2, data2Length);
   }
   EVP_DigestFinal(ctx, resultDigest, NULL);
+  EVP_MD_CTX_destroy(ctx);
 }
 
 void HMAC_SHA1(u_int8_t const* key, unsigned keyLength, u_int8_t const* text, unsigned textLength,

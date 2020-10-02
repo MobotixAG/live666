@@ -43,7 +43,7 @@ ADTSAudioStreamDiscreteFramer* ADTSAudioStreamDiscreteFramer
 
   // Unpack the 2-byte 'config' value to get "profile", "samplingFrequencyIndex",
   // and "channelConfiguration":
-  uint8_t audioObjectType = configValue>>11;
+  u_int8_t audioObjectType = configValue>>11;
   u_int8_t profile = audioObjectType == 0 ? 0 : audioObjectType-1;
   u_int8_t samplingFrequencyIndex = (configValue&0x0780)>>7;
   u_int8_t channelConfiguration = (configValue&0x0078)>>3;
