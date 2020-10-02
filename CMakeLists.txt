@@ -50,6 +50,9 @@ else ()
       -DLIVEMEDIA_STATIC
    )
 endif ()
+list ( APPEND ${PROJECT_NAME}_DEFINITIONS
+   -DNO_OPENSSL=1
+)
 add_definitions ( ${${PROJECT_NAME}_DEFINITIONS} )
 
 
