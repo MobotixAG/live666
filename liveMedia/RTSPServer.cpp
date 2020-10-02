@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2019 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2020 Live Networks, Inc.  All rights reserved.
 // A RTSP server
 // Implementation
 
@@ -714,6 +714,7 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 #ifdef DEBUG
       fprintf(stderr, "parseRTSPRequestString() returned a bogus \"Content-Length:\" value: 0x%x (%d)\n", contentLength, (int)contentLength);
 #endif
+      contentLength = 0;
       parseSucceeded = False;
     }
     if (parseSucceeded) {
@@ -739,6 +740,9 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	// If the "OPTIONS" command included a "Session:" id for a session that doesn't exist,
 	// then treat this as an error:
 	if (requestIncludedSessionId && clientSession == NULL) {
+#ifdef DEBUG
+	  fprintf(stderr, "Calling handleCmd_sessionNotFound() (case 1)\n");
+#endif
 	  handleCmd_sessionNotFound();
 	} else {
 	  // Normal case:
@@ -782,6 +786,9 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	  clientSession->handleCmd_SETUP(this, urlPreSuffix, urlSuffix, (char const*)fRequestBuffer);
 	  playAfterSetup = clientSession->fStreamAfterSETUP;
 	} else if (areAuthenticated) {
+#ifdef DEBUG
+	  fprintf(stderr, "Calling handleCmd_sessionNotFound() (case 2)\n");
+#endif
 	  handleCmd_sessionNotFound();
 	}
       } else if (strcmp(cmdName, "TEARDOWN") == 0
@@ -792,6 +799,9 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
 	if (clientSession != NULL) {
 	  clientSession->handleCmd_withinSession(this, cmdName, urlPreSuffix, urlSuffix, (char const*)fRequestBuffer);
 	} else {
+#ifdef DEBUG
+	  fprintf(stderr, "Calling handleCmd_sessionNotFound() (case 3)\n");
+#endif
 	  handleCmd_sessionNotFound();
 	}
       } else if (strcmp(cmdName, "REGISTER") == 0 || strcmp(cmdName, "DEREGISTER") == 0) {
@@ -1724,14 +1734,21 @@ void RTSPServer::RTSPClientSession
   
   // Create the "Range:" header that we'll send back in our response.
   // (Note that we do this after seeking, in case the seeking operation changed the range start time.)
+  char* rangeHeader;
   if (absStart != NULL) {
     // We're seeking by 'absolute' time:
+    char* rangeHeaderBuf;
+    
     if (absEnd == NULL) {
-      sprintf(buf, "Range: clock=%s-\r\n", absStart);
+      rangeHeaderBuf = new char[100 + strlen(absStart)]; // ample space
+      sprintf(rangeHeaderBuf, "Range: clock=%s-\r\n", absStart);
     } else {
-      sprintf(buf, "Range: clock=%s-%s\r\n", absStart, absEnd);
+      rangeHeaderBuf = new char[100 + strlen(absStart) + strlen(absEnd)]; // ample space
+      sprintf(rangeHeaderBuf, "Range: clock=%s-%s\r\n", absStart, absEnd);
     }
     delete[] absStart; delete[] absEnd;
+    rangeHeader = strDup(rangeHeaderBuf);
+    delete[] rangeHeaderBuf;
   } else {
     // We're seeking by relative (NPT) time:
     if (!sawRangeHeader || startTimeIsNow) {
@@ -1757,8 +1774,8 @@ void RTSPServer::RTSPClientSession
     } else {
       sprintf(buf, "Range: npt=%.3f-%.3f\r\n", rangeStart, rangeEnd);
     }
+    rangeHeader = strDup(buf);
   }
-  char* rangeHeader = strDup(buf);
   
   // Now, start streaming:
   for (i = 0; i < fNumStreamStates; ++i) {
