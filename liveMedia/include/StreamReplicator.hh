@@ -77,8 +77,8 @@ private:
   unsigned fNumReplicas, fNumActiveReplicas, fNumDeliveriesMadeSoFar;
   int fFrameIndex; // 0 or 1; used to figure out if a replica is requesting the current frame, or the next frame
 
-  StreamReplica* fMasterReplica; // the first replica that requests each frame.  We use its buffer when copying to the others.
-  StreamReplica* fReplicasAwaitingCurrentFrame; // other than the 'master' replica
+  StreamReplica* fPrimaryReplica; // the first replica that requests each frame.  We use its buffer when copying to the others.
+  StreamReplica* fReplicasAwaitingCurrentFrame; // other than the 'primary' replica
   StreamReplica* fReplicasAwaitingNextFrame; // replicas that have already received the current frame, and have asked for the next
 };
 #endif
