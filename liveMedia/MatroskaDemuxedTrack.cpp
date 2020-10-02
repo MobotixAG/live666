@@ -27,9 +27,9 @@ void MatroskaDemuxedTrack::seekToTime(double& seekNPT) {
 
 MatroskaDemuxedTrack::MatroskaDemuxedTrack(UsageEnvironment& env, unsigned trackNumber, MatroskaDemux& sourceDemux)
   : FramedSource(env),
-    fOurTrackNumber(trackNumber), fOurSourceDemux(sourceDemux), fDurationImbalance(0),
-    fOpusTrackNumber(0) {
-  fPrevPresentationTime.tv_sec = 0; fPrevPresentationTime.tv_usec = 0;
+    fOurTrackNumber(trackNumber), fOurSourceDemux(sourceDemux),
+    fOpusFrameNumber(0) {
+  reset();
 }
 
 MatroskaDemuxedTrack::~MatroskaDemuxedTrack() {
@@ -40,8 +40,17 @@ void MatroskaDemuxedTrack::doGetNextFrame() {
   fOurSourceDemux.continueReading();
 }
 
+void MatroskaDemuxedTrack::doStopGettingFrames() {
+  fOurSourceDemux.pause();
+}
+
 char const* MatroskaDemuxedTrack::MIMEtype() const {
   MatroskaTrack* track = fOurSourceDemux.fOurFile.lookup(fOurTrackNumber);
   if (track == NULL) return "(unknown)"; // shouldn't happen
   return track->mimeType;
+}
+
+void MatroskaDemuxedTrack::reset() {
+  fPrevPresentationTime.tv_sec = 0; fPrevPresentationTime.tv_usec = 0;
+  fDurationImbalance = 0;
 }

@@ -196,9 +196,12 @@ private:
   void removeTrack(unsigned trackNumber);
   void continueReading(); // called by a demuxed track to tell us that it has a pending read ("doGetNextFrame()")
   void seekToTime(double& seekNPT);
+  void pause();
 
   static void handleEndOfFile(void* clientData);
   void handleEndOfFile();
+
+  void resetState();
 
 private:
   MatroskaFile& fOurFile;
