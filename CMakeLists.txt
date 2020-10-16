@@ -224,6 +224,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QCELPAudioRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeFileSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeGenericRTPSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoFrameParameters.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTCP.hh
