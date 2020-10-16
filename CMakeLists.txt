@@ -5,7 +5,7 @@ set ( PROJECT_NAME live666 )
 project ( ${PROJECT_NAME} )
 
 set ( ${PROJECT_NAME}_VERSION_MAJOR "1" )
-set ( ${PROJECT_NAME}_VERSION_MINOR "23" )
+set ( ${PROJECT_NAME}_VERSION_MINOR "24" )
 set ( ${PROJECT_NAME}_VERSION_PATCH "0" )
 set ( ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
@@ -224,6 +224,7 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_LIVEMEDIA
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QCELPAudioRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeFileSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/QuickTimeGenericRTPSource.hh
+   ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoFrameParameters.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSink.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RawVideoRTPSource.hh
    ${${PROJECT_NAME}_HOME}/liveMedia/include/RTCP.hh

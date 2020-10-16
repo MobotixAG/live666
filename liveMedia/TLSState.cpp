@@ -73,9 +73,12 @@ int TLSState::write(const char* data, unsigned count) {
 int TLSState::read(u_int8_t* buffer, unsigned bufferSize) {
 #ifndef NO_OPENSSL
   int result = SSL_read(fCon, buffer, bufferSize);
-  if (result < 0 && SSL_get_error(fCon, result) == SSL_ERROR_WANT_READ) {
-    // The data can't be delivered yet.  Return 0 (bytes read); we'll try again later
-    return 0;
+  if (result <= 0) {
+    if (SSL_get_error(fCon, result) == SSL_ERROR_WANT_READ) {
+      // The data can't be delivered yet.  Return 0 (bytes read); we'll try again later
+      return 0;
+    }
+    return -1; // assume that the connection has closed
   }
   return result;
 #else
@@ -97,7 +100,7 @@ Boolean TLSState::setup(int socketNum) {
   do {
     (void)SSL_library_init();
 
-    SSL_METHOD const* meth = SSLv23_client_method();
+    SSL_METHOD const* meth = TLS_client_method();
     if (meth == NULL) break;
 
     fCtx = SSL_CTX_new(meth);
