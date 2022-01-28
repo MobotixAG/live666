@@ -57,6 +57,7 @@ FramedSource* MP3AudioFileServerMediaSubsession
     // Use the MP3 file size, plus the duration, to estimate the stream's bitrate:
     if (mp3NumBytes > 0 && fFileDuration > 0.0) {
       estBitrate = (unsigned)(mp3NumBytes/(125*fFileDuration) + 0.5); // kbps, rounded
+      if (estBitrate == 0) estBitrate = 128; // kbps, estimate
     } else {
       estBitrate = 128; // kbps, estimate
     }

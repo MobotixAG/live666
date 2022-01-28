@@ -198,7 +198,7 @@ H264or5VideoStreamParser
     fHNumber(hNumber), fOutputStartCodeSize(includeStartCodeInOutput ? 4 : 0), fHaveSeenFirstStartCode(False), fHaveSeenFirstByteOfNALUnit(False), fParsedFrameRate(0.0),
     cpb_removal_delay_length_minus1(23), dpb_output_delay_length_minus1(23),
     CpbDpbDelaysPresentFlag(0), pic_struct_present_flag(0),
-    DeltaTfiDivisor(1.0) {
+    DeltaTfiDivisor(hNumber == 264 ? 2.0 : 1.0) {
 }
 
 H264or5VideoStreamParser::~H264or5VideoStreamParser() {

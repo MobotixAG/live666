@@ -71,7 +71,7 @@ FramedSource* OggFileServerDemux::newDemuxedTrack(unsigned clientSessionId, u_in
       // for other ('real') session ids).  Because of this, a separate demultiplexor is used for each 'session 0' track.
   }
 
-  if (demuxToUse == NULL) demuxToUse = fOurOggFile->newDemux();
+  if (demuxToUse == NULL) demuxToUse = fOurOggFile->newDemux(onDemuxDeletion, this);
 
   fLastClientSessionId = clientSessionId;
   fLastCreatedDemux = demuxToUse;
@@ -106,4 +106,12 @@ void OggFileServerDemux::onOggFileCreation(OggFile* newFile) {
 
   // Now, call our own creation notification function:
   if (fOnCreation != NULL) (*fOnCreation)(this, fOnCreationClientData);
+}
+
+void OggFileServerDemux::onDemuxDeletion(void* clientData, OggDemux* demuxBeingDeleted) {
+  ((OggFileServerDemux*)clientData)->onDemuxDeletion(demuxBeingDeleted);
+}
+
+void OggFileServerDemux::onDemuxDeletion(OggDemux* demuxBeingDeleted) {
+  if (fLastCreatedDemux == demuxBeingDeleted) fLastCreatedDemux = NULL;
 }

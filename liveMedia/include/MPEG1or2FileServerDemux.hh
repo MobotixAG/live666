@@ -54,6 +54,9 @@ private:
   MPEG1or2DemuxedElementaryStream* newElementaryStream(unsigned clientSessionId,
 						       u_int8_t streamIdTag);
 
+  static void onDemuxDeletion(void* clientData, MPEG1or2Demux* demuxBeingDeleted);
+  void onDemuxDeletion(MPEG1or2Demux* demuxBeingDeleted);
+
 private:
   char const* fFileName;
   unsigned fFileSize;

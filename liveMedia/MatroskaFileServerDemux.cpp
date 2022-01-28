@@ -87,7 +87,7 @@ FramedSource* MatroskaFileServerDemux::newDemuxedTrack(unsigned clientSessionId,
       // for other ('real') session ids).  Because of this, a separate demultiplexor is used for each 'session 0' track.
   }
 
-  if (demuxToUse == NULL) demuxToUse = fOurMatroskaFile->newDemux();
+  if (demuxToUse == NULL) demuxToUse = fOurMatroskaFile->newDemux(onDemuxDeletion, this);
 
   fLastClientSessionId = clientSessionId;
   fLastCreatedDemux = demuxToUse;
@@ -118,4 +118,13 @@ void MatroskaFileServerDemux::onMatroskaFileCreation(MatroskaFile* newFile) {
 
   // Now, call our own creation notification function:
   if (fOnCreation != NULL) (*fOnCreation)(this, fOnCreationClientData);
+}
+
+void MatroskaFileServerDemux
+::onDemuxDeletion(void* clientData, MatroskaDemux* demuxBeingDeleted) {
+  ((MatroskaFileServerDemux*)clientData)->onDemuxDeletion(demuxBeingDeleted);
+}
+
+void MatroskaFileServerDemux::onDemuxDeletion(MatroskaDemux* demuxBeingDeleted) {
+  if (fLastCreatedDemux == demuxBeingDeleted) fLastCreatedDemux = NULL;
 }

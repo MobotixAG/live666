@@ -34,6 +34,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 class MatroskaTrack; // forward
 class MatroskaDemux; // forward
 
+typedef void MatroskaDemuxOnDeletionFunc(void* objectToNotify, MatroskaDemux* demuxBeingDeleted);
+
 class MatroskaFile: public Medium {
 public:
   typedef void (onCreationFunc)(MatroskaFile* newFile, void* clientData);
@@ -45,8 +47,9 @@ public:
 
   MatroskaTrack* lookup(unsigned trackNumber) const;
 
-  // Create a demultiplexor for extracting tracks from this file.  (Separate clients will typically have separate demultiplexors.)
-  MatroskaDemux* newDemux();
+  MatroskaDemux* newDemux(MatroskaDemuxOnDeletionFunc* onDeletionFunc = NULL, void* objectToNotify = NULL);
+      // Creates a demultiplexor for extracting tracks from this file.
+      // (Separate clients will typically have separate demultiplexors.)
 
   // Parameters of the file ('Segment'); set when the file is parsed:
   unsigned timecodeScale() { return fTimecodeScale; } // in nanoseconds

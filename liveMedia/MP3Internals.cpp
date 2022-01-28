@@ -97,7 +97,8 @@ unsigned int i_slen2[256]; /* MPEG 2.0 slen for intensity stereo */
 ////////// MP3FrameParams //////////
 
 MP3FrameParams::MP3FrameParams()
-  : bv(frameBytes, 0, sizeof frameBytes) /* by default */ {
+  : isMPEG2(0), samplingFreq(44100), frameSize(413), // init params, in case we're used early
+    bv(frameBytes, 0, sizeof frameBytes) /* by default */ {
   oldHdr = firstHdr = 0;
 
   static Boolean doneInit = False;

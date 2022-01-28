@@ -67,6 +67,10 @@ private:
 
   static void onMatroskaFileCreation(MatroskaFile* newFile, void* clientData);
   void onMatroskaFileCreation(MatroskaFile* newFile);
+
+  static void onDemuxDeletion(void* clientData, MatroskaDemux* demuxBeingDeleted);
+  void onDemuxDeletion(MatroskaDemux* demuxBeingDeleted);
+
 private:
   char const* fFileName; 
   onCreationFunc* fOnCreation;

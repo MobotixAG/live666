@@ -224,6 +224,7 @@ AC3AudioStreamParser
 }
 
 AC3AudioStreamParser::~AC3AudioStreamParser() {
+  delete[] fSavedFrame;
 }
 
 void AC3AudioStreamParser::registerReadInterest(unsigned char* to,
@@ -303,7 +304,7 @@ unsigned AC3AudioStreamParser::parseFrame(unsigned& numTruncatedBytes) {
 
 void AC3AudioStreamParser::readAndSaveAFrame() {
   unsigned const maxAC3FrameSize = 4000;
-  fSavedFrame = new unsigned char[maxAC3FrameSize];
+  delete[] fSavedFrame; fSavedFrame = new unsigned char[maxAC3FrameSize];
   fSavedFrameSize = 0;
 
   fSavedFrameFlag = 0;

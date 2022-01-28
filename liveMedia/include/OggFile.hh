@@ -31,6 +31,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 class OggTrack; // forward
 class OggDemux; // forward
 
+typedef void OggDemuxOnDeletionFunc(void* objectToNotify, OggDemux* demuxBeingDeleted);
+
 class OggFile: public Medium {
 public:
   typedef void (onCreationFunc)(OggFile* newFile, void* clientData);
@@ -44,7 +46,7 @@ public:
 
   OggTrack* lookup(u_int32_t trackNumber);
 
-  OggDemux* newDemux();
+  OggDemux* newDemux(OggDemuxOnDeletionFunc* onDeletionFunc = NULL, void* objectToNotify = NULL);
       // Creates a demultiplexor for extracting tracks from this file.
       // (Separate clients will typically have separate demultiplexors.)
 

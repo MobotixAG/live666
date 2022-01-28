@@ -56,11 +56,13 @@ private:
   virtual void getAttributes() const;
 
 private:
-  virtual Boolean doGetNextFrame1();
+  static void fileReadableHandler(MP3FileSource* source, int mask);
 
 private:
   MP3StreamState* fStreamState;
-  Boolean fHaveJustInitialized;
+  Boolean fFidIsSeekable;
+  Boolean fHaveStartedReading;
+  unsigned fHaveBeenInitialized;
   struct timeval fFirstFramePresentationTime; // set on stream init
   Boolean fLimitNumBytesToStream;
   unsigned fNumBytesToStream; // used iff "fLimitNumBytesToStream" is True

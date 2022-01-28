@@ -64,6 +64,10 @@ private:
 
   static void onOggFileCreation(OggFile* newFile, void* clientData);
   void onOggFileCreation(OggFile* newFile);
+
+  static void onDemuxDeletion(void* clientData, OggDemux* demuxBeingDeleted);
+  void onDemuxDeletion(OggDemux* demuxBeingDeleted);
+  
 private:
   char const* fFileName; 
   onCreationFunc* fOnCreation;
