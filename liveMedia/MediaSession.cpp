@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2020 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
 // A data structure that represents a session that consists of
 // potentially multiple (audio and/or video) sub-sessions
 // Implementation
@@ -60,13 +60,13 @@ Boolean MediaSession::lookupByName(UsageEnvironment& env,
 MediaSession::MediaSession(UsageEnvironment& env)
   : Medium(env),
     fSubsessionsHead(NULL), fSubsessionsTail(NULL),
-    fConnectionEndpointName(NULL),
+    fConnectionEndpointName(NULL), fConnectionEndpointNameAddressFamily(AF_UNSPEC),
     fHasPlayStartTime(False), fHasPlayEndTime(False),
     fMaxPlayStartTime(0.0f), fMaxPlayEndTime(0.0f), fAbsStartTime(NULL), fAbsEndTime(NULL),
     fScale(1.0f), fSpeed(1.0f),
     fMediaSessionType(NULL), fSessionName(NULL), fSessionDescription(NULL), fControlPath(NULL),
     fMIKEYState(NULL), fCrypto(NULL) {
-  fSourceFilterAddr.s_addr = 0;
+  fSourceFilterAddr = nullAddress();
 
   // Get our host name, and use this for the RTCP CNAME:
   const unsigned maxCNAMElen = 100;
@@ -337,6 +337,7 @@ static MIKEYState* parseSDPAttribute_key_mgmtToMIKEY(char const* sdpLine) {
     if (keyMgmtData_decoded == NULL) break;
 
     resultMIKEYState = MIKEYState::createNew(keyMgmtData_decoded, keyMgmtData_decodedSize);
+    delete[] keyMgmtData_decoded;
   } while (0);
 
   delete[] keyMgmtPrtclId;
@@ -357,8 +358,17 @@ Boolean MediaSession::parseSDPLine_i(char const* sdpLine) {
 Boolean MediaSession::parseSDPLine_c(char const* sdpLine) {
   // Check for "c=IN IP4 <connection-endpoint>"
   // or "c=IN IP4 <connection-endpoint>/<ttl+numAddresses>"
+  // (ditto for "c=IN IP6 ...")
   // (Later, do something with <ttl+numAddresses> also #####)
-  return parseStringValue(sdpLine, "c=IN IP4 %[^/\r\n]", fConnectionEndpointName);
+  if (parseStringValue(sdpLine, "c=IN IP4 %[^/\r\n]", fConnectionEndpointName)) {
+    fConnectionEndpointNameAddressFamily = AF_INET;
+    return True;
+  } else if (parseStringValue(sdpLine, "c=IN IP6 %[^/\r\n]", fConnectionEndpointName)) {
+    fConnectionEndpointNameAddressFamily = AF_INET6;
+    return True;
+  }
+
+  return False;
 }
 
 Boolean MediaSession::parseSDPAttribute_type(char const* sdpLine) {
@@ -430,25 +440,26 @@ Boolean MediaSession::parseSDPAttribute_range(char const* sdpLine) {
 }
 
 static Boolean parseSourceFilterAttribute(char const* sdpLine,
-					  struct in_addr& sourceAddr) {
-  // Check for a "a=source-filter:incl IN IP4 <something> <source>" line.
+					  struct sockaddr_storage& sourceFilterAddr) {
+  // Check for a "a=source-filter:incl IN IP4 <something> <source>" line (or "IN IP6").
   // Note: At present, we don't check that <something> really matches
   // one of our multicast addresses.  We also don't support more than
   // one <source> #####
   Boolean result = False; // until we succeed
   char* sourceName = NULL;
   do {
-    if (!parseStringValue(sdpLine, "a=source-filter: incl IN IP4 %*s %s", sourceName)) break;
+    int addressFamily;
+    if (parseStringValue(sdpLine, "a=source-filter: incl IN IP4 %*s %s", sourceName)) {
+      addressFamily = AF_INET;
+    } else if (parseStringValue(sdpLine, "a=source-filter: incl IN IP6 %*s %s", sourceName)) {
+      addressFamily = AF_INET6;
+    } else break;
 
     // Now, convert this name to an address, if we can:
-    NetAddressList addresses(sourceName);
+    NetAddressList addresses(sourceName, addressFamily);
     if (addresses.numAddresses() == 0) break;
 
-    netAddressBits sourceAddrBits
-      = *(netAddressBits*)(addresses.firstAddress()->data());
-    if (sourceAddrBits == 0) break;
-
-    sourceAddr.s_addr = sourceAddrBits;
+    copyAddress(sourceFilterAddr, addresses.firstAddress());
     result = True;
   } while (0);
 
@@ -632,7 +643,7 @@ private:
 MediaSubsession::MediaSubsession(MediaSession& parent)
   : serverPortNum(0), sink(NULL), miscPtr(NULL),
     fParent(parent), fNext(NULL),
-    fConnectionEndpointName(NULL),
+    fConnectionEndpointName(NULL), fConnectionEndpointNameAddressFamily(AF_UNSPEC),
     fClientPortNum(0), fRTPPayloadFormat(0xFF),
     fSavedSDPLines(NULL), fMediumName(NULL), fCodecName(NULL), fProtocolName(NULL),
     fRTPTimestampFrequency(0), fMultiplexRTCPWithRTP(False), fControlPath(NULL),
@@ -723,14 +734,14 @@ Boolean MediaSubsession::initiate(int useSpecialRTPoffset) {
 
     // Create RTP and RTCP 'Groupsocks' on which to receive incoming data.
     // (Groupsocks will work even for unicast addresses)
-    struct in_addr tempAddr;
-    tempAddr.s_addr = connectionEndpointAddress();
+    struct sockaddr_storage tempAddr;
+    getConnectionEndpointAddress(tempAddr);
         // This could get changed later, as a result of a RTSP "SETUP"
 
     Boolean const useSRTP = strcmp(fProtocolName, "SRTP") == 0;
     Boolean const protocolIsRTP = useSRTP || strcmp(fProtocolName, "RTP") == 0;
 
-    if (fClientPortNum != 0 && (honorSDPPortChoice || IsMulticastAddress(tempAddr.s_addr))) {
+    if (fClientPortNum != 0 && (honorSDPPortChoice || IsMulticastAddress(tempAddr))) {
       // The sockets' port numbers were specified for us.  Use these:
       if (protocolIsRTP && !fMultiplexRTCPWithRTP) {
 	fClientPortNum = fClientPortNum&~1;
@@ -787,7 +798,7 @@ Boolean MediaSubsession::initiate(int useSpecialRTPoffset) {
 
 	// Get the client port number:
 	Port clientPort(0);
-	if (!getSourcePort(env(), fRTPSocket->socketNum(), clientPort)) {
+	if (!getSourcePort(env(), fRTPSocket->socketNum(), tempAddr.ss_family, clientPort)) {
 	  break;
 	}
 	fClientPortNum = ntohs(clientPort.num()); 
@@ -850,7 +861,7 @@ Boolean MediaSubsession::initiate(int useSpecialRTPoffset) {
 
     if (isSSM() && fRTCPSocket != NULL) {
       // Special case for RTCP SSM: Send RTCP packets back to the source via unicast:
-      fRTCPSocket->changeDestinationParameters(fSourceFilterAddr,0,~0);
+      fRTCPSocket->changeDestinationParameters(fSourceFilterAddr, 0, ~0);
     }
 
     // Create "fRTPSource" and "fReadSource":
@@ -951,9 +962,9 @@ char const* MediaSubsession::fmtp_config() const {
   return result;
 }
 
-netAddressBits MediaSubsession::connectionEndpointAddress() const {
+void MediaSubsession::getConnectionEndpointAddress(struct sockaddr_storage& addr) const {
   do {
-    // Get the endpoint name from with us, or our parent session:
+    // Get the endpoint name from us, or from our parent session:
     char const* endpointString = connectionEndpointName();
     if (endpointString == NULL) {
       endpointString = parentSession().connectionEndpointName();
@@ -961,34 +972,35 @@ netAddressBits MediaSubsession::connectionEndpointAddress() const {
     if (endpointString == NULL) break;
 
     // Now, convert this name to an address, if we can:
-    NetAddressList addresses(endpointString);
+    NetAddressList addresses(endpointString, connectionEndpointNameAddressFamily());
     if (addresses.numAddresses() == 0) break;
 
-    return *(netAddressBits*)(addresses.firstAddress()->data());
+    copyAddress(addr, addresses.firstAddress());
+    return;
   } while (0);
 
-  // No address known:
-  return 0;
+  // Address unknown; set it to a 'null' value:
+  addr = nullAddress();
 }
 
-void MediaSubsession::setDestinations(netAddressBits defaultDestAddress) {
+void MediaSubsession::setDestinations(struct sockaddr_storage const& defaultDestAddress) {
   // Get the destination address from the connection endpoint name
-  // (This will be 0 if it's not known, in which case we use the default)
-  netAddressBits destAddress = connectionEndpointAddress();
-  if (destAddress == 0) destAddress = defaultDestAddress;
-  struct in_addr destAddr; destAddr.s_addr = destAddress;
+  // (This will be 0 if it's not known, in which case we use the default instead)
+  struct sockaddr_storage destAddress;
+  getConnectionEndpointAddress(destAddress);
+  if (addressIsNull(destAddress)) destAddress = defaultDestAddress;
 
   // The destination TTL remains unchanged:
   int destTTL = ~0; // means: don't change
 
   if (fRTPSocket != NULL) {
     Port destPort(serverPortNum);
-    fRTPSocket->changeDestinationParameters(destAddr, destPort, destTTL);
+    fRTPSocket->changeDestinationParameters(destAddress, destPort, destTTL);
   }
   if (fRTCPSocket != NULL && !isSSM() && !fMultiplexRTCPWithRTP) {
     // Note: For SSM sessions, the dest address for RTCP was already set.
     Port destPort(serverPortNum+1);
-    fRTCPSocket->changeDestinationParameters(destAddr, destPort, destTTL);
+    fRTCPSocket->changeDestinationParameters(destAddress, destPort, destTTL);
   }
 }
 
@@ -1051,8 +1063,17 @@ void MediaSubsession
 Boolean MediaSubsession::parseSDPLine_c(char const* sdpLine) {
   // Check for "c=IN IP4 <connection-endpoint>"
   // or "c=IN IP4 <connection-endpoint>/<ttl+numAddresses>"
+  // (ditto for "c=IN IP6 ...")
   // (Later, do something with <ttl+numAddresses> also #####)
-  return parseStringValue(sdpLine, "c=IN IP4 %[^/\r\n]", fConnectionEndpointName);
+  if (parseStringValue(sdpLine, "c=IN IP4 %[^/\r\n]", fConnectionEndpointName)) {
+    fConnectionEndpointNameAddressFamily = AF_INET;
+    return True;
+  } else if (parseStringValue(sdpLine, "c=IN IP6 %[^/\r\n]", fConnectionEndpointName)) {
+    fConnectionEndpointNameAddressFamily = AF_INET6;
+    return True;
+  }
+
+  return False;
 }
 
 Boolean MediaSubsession::parseSDPLine_b(char const* sdpLine) {
