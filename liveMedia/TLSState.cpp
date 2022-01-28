@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2020 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
 // State encapsulating a TLS connection
 // Implementation
 
@@ -100,7 +100,7 @@ Boolean TLSState::setup(int socketNum) {
   do {
     (void)SSL_library_init();
 
-    SSL_METHOD const* meth = TLS_client_method();
+    SSL_METHOD const* meth = SSLv23_client_method();
     if (meth == NULL) break;
 
     fCtx = SSL_CTX_new(meth);
