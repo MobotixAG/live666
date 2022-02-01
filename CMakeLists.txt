@@ -28,6 +28,7 @@ include_directories ( ${${PROJECT_NAME}_HOME}/liveMedia/include )
 if ( WIN32 )
    list ( APPEND ${PROJECT_NAME}_DEFINITIONS
       -DWINNT
+      -DNO_GETIFADDRS
    )
 else ()
    list ( APPEND ${PROJECT_NAME}_DEFINITIONS
