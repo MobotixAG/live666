@@ -79,7 +79,7 @@ LIVEMEDIA_API Boolean socketLeaveGroupSSM(UsageEnvironment&, int socket,
 Boolean getSourcePort(UsageEnvironment& env, int socket, Port& port);
 LIVEMEDIA_API Boolean getSourcePort(UsageEnvironment& env, int socket, int domain, Port& port);
 
-netAddressBits ourIPAddress(UsageEnvironment& env); // in network orderLIVEMEDIA_API ipv4AddressBits ourIPv4Address(UsageEnvironment& env); // in network order
+LIVEMEDIA_API ipv4AddressBits ourIPv4Address(UsageEnvironment& env); // in network order
 LIVEMEDIA_API ipv6AddressBits const& ourIPv6Address(UsageEnvironment& env);
 
 Boolean weHaveAnIPv4Address(UsageEnvironment& env);
