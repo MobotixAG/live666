@@ -86,7 +86,6 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_GROUPSOCK
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetAddress.hh
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetCommon.h
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetInterface.hh
-   ${${PROJECT_NAME}_HOME}/groupsock/include/TunnelEncaps.hh
 )
 # Group (Filter) source files
 source_group ( "Header Files\\groupsock" FILES ${${PROJECT_NAME}_HEADERS_GROUPSOCK} )
