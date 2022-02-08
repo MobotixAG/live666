@@ -5,7 +5,7 @@ set ( PROJECT_NAME live666 )
 project ( ${PROJECT_NAME} )
 
 set ( ${PROJECT_NAME}_VERSION_MAJOR "1" )
-set ( ${PROJECT_NAME}_VERSION_MINOR "24" )
+set ( ${PROJECT_NAME}_VERSION_MINOR "25" )
 set ( ${PROJECT_NAME}_VERSION_PATCH "0" )
 set ( ${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
@@ -28,6 +28,7 @@ include_directories ( ${${PROJECT_NAME}_HOME}/liveMedia/include )
 if ( WIN32 )
    list ( APPEND ${PROJECT_NAME}_DEFINITIONS
       -DWINNT
+      -DNO_GETIFADDRS
    )
 else ()
    list ( APPEND ${PROJECT_NAME}_DEFINITIONS
@@ -86,7 +87,6 @@ list ( APPEND ${PROJECT_NAME}_HEADERS_GROUPSOCK
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetAddress.hh
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetCommon.h
    ${${PROJECT_NAME}_HOME}/groupsock/include/NetInterface.hh
-   ${${PROJECT_NAME}_HOME}/groupsock/include/TunnelEncaps.hh
 )
 # Group (Filter) source files
 source_group ( "Header Files\\groupsock" FILES ${${PROJECT_NAME}_HEADERS_GROUPSOCK} )
