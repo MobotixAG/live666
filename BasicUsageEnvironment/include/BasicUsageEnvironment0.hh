@@ -73,7 +73,12 @@ private:
 
 class HandlerSet; // forward
 
+// Note: You may redefine MAX_NUM_EVENT_TRIGGERS,
+// but it must be <= the number of bits in an "EventTriggerId"
+#ifndef MAX_NUM_EVENT_TRIGGERS
 #define MAX_NUM_EVENT_TRIGGERS 32
+#endif
+#define EVENT_TRIGGER_ID_HIGH_BIT (1 << (MAX_NUM_EVENT_TRIGGERS-1))
 
 // An abstract base class, useful for subclassing
 // (e.g., to redefine the implementation of socket event handling)

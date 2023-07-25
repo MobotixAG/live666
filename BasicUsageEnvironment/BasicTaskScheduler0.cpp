@@ -95,7 +95,7 @@ EventTriggerId BasicTaskScheduler0::createEventTrigger(TaskFunc* eventHandlerPro
   do {
     i = (i+1)%MAX_NUM_EVENT_TRIGGERS;
     mask >>= 1;
-    if (mask == 0) mask = 0x80000000;
+    if (mask == 0) mask = EVENT_TRIGGER_ID_HIGH_BIT;
 
     if (fTriggeredEventHandlers[i] == NULL) {
       // This trigger number is free; use it:
@@ -117,7 +117,7 @@ EventTriggerId BasicTaskScheduler0::createEventTrigger(TaskFunc* eventHandlerPro
 void BasicTaskScheduler0::deleteEventTrigger(EventTriggerId eventTriggerId) {
   // "eventTriggerId" should have just one bit set.
   // However, we do the reasonable thing if the user happened to 'or' together two or more "EventTriggerId"s:
-  EventTriggerId mask = 0x80000000;
+  EventTriggerId mask = EVENT_TRIGGER_ID_HIGH_BIT;
   Boolean eventTriggersAreBeingUsed = False;
 
   for (unsigned i = 0; i < MAX_NUM_EVENT_TRIGGERS; ++i) {
@@ -140,7 +140,7 @@ void BasicTaskScheduler0::deleteEventTrigger(EventTriggerId eventTriggerId) {
 
 void BasicTaskScheduler0::triggerEvent(EventTriggerId eventTriggerId, void* clientData) {
   // First, record the "clientData".  (Note that we allow "eventTriggerId" to be a combination of bits for multiple events.)
-  EventTriggerId mask = 0x80000000;
+  EventTriggerId mask = EVENT_TRIGGER_ID_HIGH_BIT;
   for (unsigned i = 0; i < MAX_NUM_EVENT_TRIGGERS; ++i) {
     if ((eventTriggerId&mask) != 0) {
       fTriggeredEventClientDatas[i] = clientData;

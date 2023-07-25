@@ -185,7 +185,7 @@ void BasicTaskScheduler::SingleStep(unsigned maxDelayTime) {
     do {
       i = (i+1)%MAX_NUM_EVENT_TRIGGERS;
       mask >>= 1;
-      if (mask == 0) mask = 0x80000000;
+      if (mask == 0) mask = EVENT_TRIGGER_ID_HIGH_BIT;
 
 #ifndef NO_STD_LIB
       if (fTriggersAwaitingHandling[i].test()) {

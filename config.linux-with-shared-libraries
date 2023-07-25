@@ -9,7 +9,7 @@ libliveMedia_VERSION_AGE=3
 libliveMedia_LIB_SUFFIX=so.$(shell expr $(libliveMedia_VERSION_CURRENT) - $(libliveMedia_VERSION_AGE)).$(libliveMedia_VERSION_AGE).$(libliveMedia_VERSION_REVISION)
 
 libBasicUsageEnvironment_VERSION_CURRENT=2
-libBasicUsageEnvironment_VERSION_REVISION=2
+libBasicUsageEnvironment_VERSION_REVISION=3
 libBasicUsageEnvironment_VERSION_AGE=0
 libBasicUsageEnvironment_LIB_SUFFIX=so.$(shell expr $(libBasicUsageEnvironment_VERSION_CURRENT) - $(libBasicUsageEnvironment_VERSION_AGE)).$(libBasicUsageEnvironment_VERSION_AGE).$(libBasicUsageEnvironment_VERSION_REVISION)
 
