@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "groupsock"
-// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
 // Helper routines to implement 'group sockets'
 // C++ header
 
@@ -26,6 +26,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #endif
 
 #include "export.h"
+
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
 
 LIVEMEDIA_API int setupDatagramSocket(UsageEnvironment& env, Port port, int domain);
 LIVEMEDIA_API int setupStreamSocket(UsageEnvironment& env, Port port, int domain,
@@ -91,6 +95,7 @@ Boolean weHaveAnIPAddress(UsageEnvironment& env);
 // are INADDR_ANY (i.e., 0), specifying the default interface.)
 extern LIVEMEDIA_API ipv4AddressBits SendingInterfaceAddr;
 extern LIVEMEDIA_API ipv4AddressBits ReceivingInterfaceAddr;
+extern in6_addr ReceivingInterfaceAddr6;
 
 // Allocates a randomly-chosen IPv4 SSM (multicast) address:
 LIVEMEDIA_API ipv4AddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);
@@ -113,10 +118,11 @@ LIVEMEDIA_API char const* timestampString();
     var.sin_addr.s_addr = (adr);\
     var.sin_port = (prt);\
     SET_SOCKADDR_SIN_LEN(var);
-#define MAKE_SOCKADDR_IN6(var,prt) /*adr,prt must be in network order*/\
+#define MAKE_SOCKADDR_IN6(var,adr,prt) /*adr,prt must be in network order*/\
     struct sockaddr_in6 var;\
     memset(&var, 0, sizeof var);\
     var.sin6_family = AF_INET6;\
+    var.sin6_addr=adr;\
     var.sin6_port = (prt);\
     SET_SOCKADDR_SIN6_LEN(var);
 
