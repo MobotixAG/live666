@@ -17,6 +17,10 @@ if ( NOT DEFINED BUILD_SHARED_LIBS )
    set ( BUILD_SHARED_LIBS TRUE )
 endif ()
 
+if ( NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 20 )
+   set ( CMAKE_CXX_STANDARD 20 )
+endif ()
+
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 
 set ( ${PROJECT_NAME}_HOME ${CMAKE_CURRENT_SOURCE_DIR} )
@@ -535,6 +539,7 @@ if ( WIN32 AND NOT CMAKE_COMPILER_IS_GNUCXX )
    list ( APPEND ${PROJECT_NAME}_DISABLE_WARNINGS
       "/wd4018" # 'expression' : signed/unsigned mismatch
       "/wd4244" # 'conversion' conversion from 'type1' to 'type2', possible loss of data
+      "/wd4251" # 'type' : class 'type1' needs to have dll-interface to be used by clients of class 'type2'
       "/wd4267" # 'var' : conversion from 'size_t' to 'type', possible loss of data
       "/wd4312" # 'operation' : conversion from 'type1' to 'type2' of greater size
       "/wd4334" # 'operator' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)

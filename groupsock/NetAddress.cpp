@@ -23,6 +23,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 #include <stddef.h>
 #include <stdio.h>
+#include <cstring>
 
 #ifndef INADDR_NONE
 #define INADDR_NONE 0xFFFFFFFF
@@ -157,7 +158,7 @@ Boolean operator==(struct sockaddr_storage const& left, struct sockaddr_storage 
       return ((struct sockaddr_in const&)left).sin_addr.s_addr == ((struct sockaddr_in const&)right).sin_addr.s_addr;
     }
     case AF_INET6: {
-      return ((struct sockaddr_in6 const&)left).sin6_addr.s6_addr == ((struct sockaddr_in6 const&)right).sin6_addr.s6_addr;
+      return 0==std::memcmp(((struct sockaddr_in6 const&)left).sin6_addr.s6_addr, ((struct sockaddr_in6 const&)right).sin6_addr.s6_addr, sizeof(IN6_ADDR));
     }
     default: {
       return False;
