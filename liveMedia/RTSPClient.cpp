@@ -447,7 +447,6 @@ RTSPClient::~RTSPClient() {
   delete[] fRequireStr;
   delete[] fResponseBuffer;
   delete[] fUserAgentHeaderStr;
-  delete[] fRequireTag;
 }
 
 void RTSPClient::reset() {
@@ -474,17 +473,6 @@ int RTSPClient::grabSocket() {
   fInputSocketNum = -1;
 
   return inputSocket;
-}
-
-static char* createRequireString(char const* requireTag) {
-   char* requireTagStr;
-   if (requireTag != NULL) {
-      requireTagStr = new char[20+strlen(requireTag)];
-      sprintf(requireTagStr, "Require: %s\r\n", requireTag);
-   } else {
-      requireTagStr = strDup("");
-   }
-   return requireTagStr;
 }
 
 unsigned RTSPClient::sendRequest(RequestRecord* request) {
@@ -551,8 +539,6 @@ unsigned RTSPClient::sendRequest(RequestRecord* request) {
 
     char* authenticatorStr = createAuthenticatorString(request->commandName(), fBaseURL);
 
-    char* requireTagStr = createRequireString(fRequireTag);
-
     char const* const cmdFmt =
       "%s %s %s\r\n"
       "CSeq: %d\r\n"
@@ -583,7 +569,6 @@ unsigned RTSPClient::sendRequest(RequestRecord* request) {
 	    contentLengthHeader,
 	    contentStr);
     delete[] authenticatorStr;
-    delete[] requireTagStr;
     if (cmdURLWasAllocated) delete[] cmdURL;
     if (extraHeadersWereAllocated) delete[] extraHeaders;
     if (contentLengthHeaderWasAllocated) delete[] contentLengthHeader;

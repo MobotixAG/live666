@@ -386,8 +386,6 @@ private:
   RequestQueue fRequestsAwaitingConnection, fRequestsAwaitingHTTPTunneling, fRequestsAwaitingResponse;
   char* fRequireStr;
 
-  char* fRequireTag; // current value that is used for all the RTSP commands in the 'Require:' header
-
   // Support for tunneling RTSP-over-HTTP:
   char fSessionCookie[33];
   unsigned fSessionCookieCounter;
