@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
 // A generic media server class, used to implement a RTSP server, and any other server that uses
 //  "ServerMediaSession" objects to describe media to be served.
 // Implementation
@@ -189,7 +189,6 @@ int GenericMediaServer::setUpOurSocket(UsageEnvironment& env, Port& ourPort, int
 #endif
     
     ourSocket = setupStreamSocket(env, ourPort, domain, True, True);
-        // later fix to support IPv6
     if (ourSocket < 0) break;
     
     // Make sure we have a big send buffer:
@@ -265,6 +264,8 @@ GenericMediaServer::ClientConnection
 		   int clientSocket, struct sockaddr_storage const& clientAddr,
 		   Boolean useTLS)
   : fOurServer(ourServer), fOurSocket(clientSocket), fClientAddr(clientAddr), fTLS(envir()) {
+  fInputTLS = fOutputTLS = &fTLS;
+
   // Add ourself to our 'client connections' table:
   fOurServer.fClientConnections->Add((char const*)this, this);
   
@@ -304,16 +305,16 @@ void GenericMediaServer::ClientConnection::incomingRequestHandler(void* instance
 }
 
 void GenericMediaServer::ClientConnection::incomingRequestHandler() {
-  if (fTLS.tlsAcceptIsNeeded) { // we need to successfully call fTLS.accept() first:
-    if (fTLS.accept(fOurSocket) <= 0) return; // either an error, or we need to try again later
+  if (fInputTLS->tlsAcceptIsNeeded) { // we need to successfully call fInputTLS->accept() first:
+    if (fInputTLS->accept(fOurSocket) <= 0) return; // either an error, or we need to try again later
 
-    fTLS.tlsAcceptIsNeeded = False;
+    fInputTLS->tlsAcceptIsNeeded = False;
     // We can now read data, as usual:
   }
 
   int bytesRead;
-  if (fTLS.isNeeded) {
-    bytesRead = fTLS.read(&fRequestBuffer[fRequestBytesAlreadySeen], fRequestBufferBytesLeft);
+  if (fInputTLS->isNeeded) {
+    bytesRead = fInputTLS->read(&fRequestBuffer[fRequestBytesAlreadySeen], fRequestBufferBytesLeft);
   } else {
     struct sockaddr_storage dummy; // 'from' address, meaningless in this case
   
