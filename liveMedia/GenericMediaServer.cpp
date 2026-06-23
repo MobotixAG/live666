@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2026 Live Networks, Inc.  All rights reserved.
 // A generic media server class, used to implement a RTSP server, and any other server that uses
 //  "ServerMediaSession" objects to describe media to be served.
 // Implementation
@@ -54,9 +54,9 @@ struct lsmsMemberFunctionRecord {
   void (GenericMediaServer::*fMemberFunc)(ServerMediaSession*);
 };
 
-static void lsmsMemberFunctionCompletionFunc(void* clientData, ServerMediaSession* sessionLookedUp) {
+static void lsmsMemberFunctionCompletionFunc(void* clientData, ServerMediaSession* smsLookedUp) {
   lsmsMemberFunctionRecord* memberFunctionRecord = (lsmsMemberFunctionRecord*)clientData;
-  (memberFunctionRecord->fServer->*(memberFunctionRecord->fMemberFunc))(sessionLookedUp);
+  (memberFunctionRecord->fServer->*(memberFunctionRecord->fMemberFunc))(smsLookedUp);
   delete memberFunctionRecord;
 }
 
@@ -259,6 +259,8 @@ void GenericMediaServer
 
 ////////// GenericMediaServer::ClientConnection implementation //////////
 
+static u_int32_t lastClientConnectionId = 0; // identifies each connection (can wrap around)
+
 GenericMediaServer::ClientConnection
 ::ClientConnection(GenericMediaServer& ourServer,
 		   int clientSocket, struct sockaddr_storage const& clientAddr,
@@ -267,7 +269,10 @@ GenericMediaServer::ClientConnection
   fInputTLS = fOutputTLS = &fTLS;
 
   // Add ourself to our 'client connections' table:
-  fOurServer.fClientConnections->Add((char const*)this, this);
+  do {
+    fConnectionId = ++lastClientConnectionId;
+  } while (fOurServer.fClientConnections->Lookup((char const*)fConnectionId) != NULL);
+  fOurServer.fClientConnections->Add((char const*)fConnectionId, this);
   
   if (useTLS) {
     // Perform extra processing to handle a TLS connection:
@@ -286,7 +291,7 @@ GenericMediaServer::ClientConnection
 
 GenericMediaServer::ClientConnection::~ClientConnection() {
   // Remove ourself from the server's 'client connections' hash table before we go:
-  fOurServer.fClientConnections->Remove((char const*)this);
+  fOurServer.fClientConnections->Remove((char const*)fConnectionId);
   
   closeSockets();
 }
@@ -306,7 +311,12 @@ void GenericMediaServer::ClientConnection::incomingRequestHandler(void* instance
 
 void GenericMediaServer::ClientConnection::incomingRequestHandler() {
   if (fInputTLS->tlsAcceptIsNeeded) { // we need to successfully call fInputTLS->accept() first:
-    if (fInputTLS->accept(fOurSocket) <= 0) return; // either an error, or we need to try again later
+    int tlsAcceptResult = fInputTLS->accept(fOurSocket);
+    if (tlsAcceptResult <= 0) { // either an error, or we need to try again later
+      if (tlsAcceptResult < 0) delete this; // an error; this connection cannot continue
+
+      return;
+    }
 
     fInputTLS->tlsAcceptIsNeeded = False;
     // We can now read data, as usual:
@@ -326,6 +336,11 @@ void GenericMediaServer::ClientConnection::incomingRequestHandler() {
 void GenericMediaServer::ClientConnection::resetRequestBuffer() {
   fRequestBytesAlreadySeen = 0;
   fRequestBufferBytesLeft = sizeof fRequestBuffer;
+}
+
+GenericMediaServer::ClientConnection* GenericMediaServer
+::lookupClientConnection(u_int32_t connectionId) const {
+  return (class ClientConnection*)(fClientConnections->Lookup((char const*)connectionId));
 }
 
 
@@ -398,7 +413,9 @@ GenericMediaServer::ClientSession* GenericMediaServer::createNewClientSessionWit
   // because that has a special use by some servers.  Similarly, we avoid choosing the same
   // session id twice in a row.)
   do {
-    sessionId = (u_int32_t)our_random32();
+    struct timeval timeNow;
+    gettimeofday(&timeNow, NULL);
+    sessionId = (u_int32_t)(our_random32() ^ timeNow.tv_sec ^ timeNow.tv_usec);
     snprintf(sessionIdStr, sizeof sessionIdStr, "%08X", sessionId);
   } while (sessionId == 0 || sessionId == fPreviousClientSessionId
 	   || lookupClientSession(sessionIdStr) != NULL);
