@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "groupsock"
-// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2026 Live Networks, Inc.  All rights reserved.
 // Helper routines to implement 'group sockets'
 // C++ header
 
@@ -96,6 +96,9 @@ Boolean weHaveAnIPAddress(UsageEnvironment& env);
 extern LIVEMEDIA_API ipv4AddressBits SendingInterfaceAddr;
 extern LIVEMEDIA_API ipv4AddressBits ReceivingInterfaceAddr;
 extern in6_addr ReceivingInterfaceAddr6;
+#ifdef SO_BINDTODEVICE
+extern char InterfaceBindToDevice[128];
+#endif
 
 // Allocates a randomly-chosen IPv4 SSM (multicast) address:
 LIVEMEDIA_API ipv4AddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);

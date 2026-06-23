@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2026 Live Networks, Inc.  All rights reserved.
 // A class that encapsulates a Matroska file.
 // C++ header
 
@@ -154,11 +154,11 @@ public:
   unsigned samplingFrequency;
   unsigned numChannels;
   char const* mimeType;
-  unsigned codecPrivateSize;
+  u_int32_t codecPrivateSize;
   u_int8_t* codecPrivate;
   Boolean codecPrivateUsesH264FormatForH265; // a hack specifically for H.265 video tracks
   Boolean codecIsOpus; // a hack for Opus audio
-  unsigned headerStrippedBytesSize;
+  u_int32_t headerStrippedBytesSize;
   u_int8_t* headerStrippedBytes;
   char const* colorSampling;
   char const* colorimetry;

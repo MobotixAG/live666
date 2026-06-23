@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2026 Live Networks, Inc.  All rights reserved.
 // RTCP
 // Implementation
 
@@ -102,7 +102,7 @@ void RTCPMemberDatabase::reapOldMembers(unsigned threshold) {
 #ifdef DEBUG
         fprintf(stderr, "reap: removing SSRC 0x%x\n", oldSSRC);
 #endif
-	fOurRTCPInstance.removeSSRC(oldSSRC, True);
+	fOurRTCPInstance.removeSSRC(oldSSRC, False/*keep stats around*/);
     }
   } while (foundOldMember);
 }
@@ -284,7 +284,7 @@ unsigned RTCPInstance::numMembers() const {
 }
 
 void RTCPInstance::setupForSRTCP() {
-  if (fCrypto == NULL && fSink != NULL) { // take crypto state (if any) from the sink instead:
+  if (fSink != NULL) { // take crypto state (if any) from the sink:
     fCrypto = fSink->getCrypto();
   }
 }

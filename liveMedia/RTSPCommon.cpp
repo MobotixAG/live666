@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2023 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2026 Live Networks, Inc.  All rights reserved.
 // Common routines used by both RTSP clients and servers
 // Implementation
 
@@ -23,15 +23,15 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h> // for "isxdigit()
-#include <time.h> // for "strftime()" and "gmtime()"
+#include <time.h> // for "gmtime()"
 
 static void decodeURL(char* url) {
   // Replace (in place) any %<hex><hex> sequences with the appropriate 8-bit character.
   char* cursor = url;
   while (*cursor) {
     if ((cursor[0] == '%') &&
-	cursor[1] && isxdigit(cursor[1]) &&
-	cursor[2] && isxdigit(cursor[2])) {
+	cursor[1] && isxdigit((unsigned char)cursor[1]) &&
+	cursor[2] && isxdigit((unsigned char)cursor[2])) {
       // We saw a % followed by 2 hex digits, so we copy the literal hex value into the URL, then advance the cursor past it:
       char hex[3];
       hex[0] = cursor[1];
@@ -67,7 +67,8 @@ Boolean parseRTSPRequestString(char const* reqStr, unsigned reqStrSize,
   unsigned i;
   for (i = 0; i < reqStrSize; ++i) {
     char c = reqStr[i];
-    if (!(c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\0')) break;
+    if (c == '\0') return False; // the NULL character isn't allowed
+    if (!(c == ' ' || c == '\t' || c == '\r' || c == '\n')) break;
   }
   if (i == reqStrSize) return False; // The request consisted of nothing but whitespace!
 
@@ -166,9 +167,9 @@ Boolean parseRTSPRequestString(char const* reqStr, unsigned reqStrSize,
       for (n = 0; n < resultCSeqMaxSize-1 && j < reqStrSize; ++n,++j) {
 	char c = reqStr[j];
 	if (c == '\r' || c == '\n') {
-	  parseSucceeded = True;
+	  if (n > 0) parseSucceeded = True; // The CSeq string must be non-empty
 	  break;
-	}
+	} else if (!(c >= '0' && c <= '9')) break; // The CSeq string must be numeric
 
 	resultCSeq[n] = c;
       }
@@ -361,13 +362,19 @@ char const* dateHeader() {
       time_tm = tm{};
   }
 #else
-  if (gmtime_r(&tt, &time_tm) == nullptr) {
+  if (gmtime_r(&tt, &time_tm) == NULL) {
     time_tm = tm();
   }
 #endif
-  strftime(buf, sizeof buf, "Date: %a, %b %d %Y %H:%M:%S GMT\r\n", &time_tm);
+  static const char* day[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+  static const char* month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  snprintf(buf, sizeof buf, "Date: %s, %s %02d %04d %02d:%02d:%02d GMT\r\n",
+          day[time_tm.tm_wday], month[time_tm.tm_mon], time_tm.tm_mday,
+          1900 + time_tm.tm_year,
+          time_tm.tm_hour, time_tm.tm_min, time_tm.tm_sec);
 #else
-  // WinCE apparently doesn't have "time()", "strftime()", or "gmtime()",
+  // WinCE apparently doesn't have "time()", or "gmtime()",
   // so generate the "Date:" header a different, WinCE-specific way.
   // (Thanks to Pierre l'Hussiez for this code)
   // RSF: But where is the "Date: " string?  This code doesn't look quite right...
